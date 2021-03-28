@@ -30,6 +30,22 @@ exports.webpackCommonConfig = {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: "asset/resource",
       },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: "asset/resource",
+      },
+      {
+        test: /\.png|svg|jpg|gif$/,
+        use: ["file-loader"],
+      },
+      {
+        test: /\.less$/i,
+        loader: "less-loader", // compiles Less to CSS
+      },
     ],
   },
 };
