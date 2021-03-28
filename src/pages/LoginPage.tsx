@@ -12,7 +12,10 @@ export function LoginPage() {
 
   return (
     <>
-      <Container className="shadow-sm p-3 mb-5 bg-white rounded">
+      <Container
+        className="shadow-sm p-3 mb-5 bg-white rounded"
+        style={{ width: "55%" }}
+      >
         <Row>
           <Col>
             <Form.Group controlId="formBasicEmail">
@@ -35,7 +38,8 @@ export function LoginPage() {
               Login
             </Button>
           </Col>
-          <Col>
+          <div style={{ borderLeft: "4px solid lightgrey" }}></div>
+          <Col style={{ display: "flex", alignItems: "center" }}>
             <GoogleButton />
           </Col>
         </Row>
