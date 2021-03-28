@@ -1,6 +1,7 @@
 import * as React from "react";
 import { ChangeEvent, useState } from "react";
-import { Button, Container, Form } from "semantic-ui-react";
+import { Button, Container, Form, Col, Row } from "react-bootstrap";
+import { GoogleButton } from "../components/GoogleButton";
 
 export function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -10,28 +11,35 @@ export function LoginPage() {
   }
 
   return (
-    <Container>
-      <Form>
-        <Form.Field>
-          <label>email</label>
-          <input
-            type="email"
-            name="email"
-            placeholder="email"
-            onChange={handleChange}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>password</label>
-          <input
-            type="password"
-            name="password"
-            placeholder="password"
-            onChange={handleChange}
-          />
-        </Form.Field>
-        <Button type="submit">Submit</Button>
-      </Form>
-    </Container>
+    <>
+      <Container className="shadow-sm p-3 mb-5 bg-white rounded">
+        <Row>
+          <Col>
+            <Form.Group controlId="formBasicEmail">
+              <Form.Label>Email address</Form.Label>
+              <Form.Control
+                onChange={handleChange}
+                type="email"
+                placeholder="Enter email"
+              />
+            </Form.Group>
+            <Form.Group controlId="formBasicPassword">
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                onChange={handleChange}
+                type="password"
+                placeholder="Password"
+              />
+            </Form.Group>
+            <Button variant="primary" type="submit">
+              Login
+            </Button>
+          </Col>
+          <Col>
+            <GoogleButton />
+          </Col>
+        </Row>
+      </Container>
+    </>
   );
 }
