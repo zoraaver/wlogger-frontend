@@ -6,7 +6,7 @@ import { Navbar } from "./NavBar";
 
 export function App() {
   return (
-    <div>
+    <>
       <Navbar />
       <Switch>
         <Route exact path="/login">
@@ -16,6 +16,6 @@ export function App() {
           <HomePage />
         </Route>
       </Switch>
-    </div>
+    </>
   );
 }
