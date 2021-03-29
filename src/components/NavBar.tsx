@@ -5,7 +5,12 @@ import { Nav } from "react-bootstrap";
 export function Navbar() {
   return (
     <Bootstrap.Navbar bg="info" fixed="top" variant="dark">
-      <Bootstrap.Navbar.Brand href="#home">wLogger</Bootstrap.Navbar.Brand>
+      <Bootstrap.Navbar.Brand
+        href="#home"
+        style={{ fontFamily: "Balsamiq Sans" }}
+      >
+        wLogger
+      </Bootstrap.Navbar.Brand>
       <Bootstrap.Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Nav>
         <Nav.Link href="/">Home</Nav.Link>
