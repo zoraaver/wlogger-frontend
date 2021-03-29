@@ -19,17 +19,22 @@
   },
   "homepage": "https://github.com/zoraaver/wlogger-frontend#readme",
   "dependencies": {
+    "@reduxjs/toolkit": "^1.5.1",
+    "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "react": "^17.0.2",
     "react-bootstrap": "^1.5.2",
     "react-dom": "^17.0.2",
     "react-google-login": "^5.2.2",
+    "react-redux": "^7.2.3",
     "react-router-dom": "^5.2.0"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/react": "^17.0.3",
     "@types/react-bootstrap": "^0.32.25",
     "@types/react-dom": "^17.0.3",
+    "@types/react-redux": "^7.1.16",
     "@types/react-router-dom": "^5.1.7",
     "css-loader": "^5.2.0",
     "file-loader": "^6.2.0",
