@@ -9,8 +9,9 @@ export function LoginPage() {
       className="vh-100"
       style={{
         backgroundColor: "powderblue",
-        display: "inline-flex",
+        display: "flex",
         alignItems: "center",
+        justifyContent: "left",
       }}
     >
       <div style={{ fontFamily: "Balsamiq Sans" }} className="ml-5">

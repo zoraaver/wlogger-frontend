@@ -11,8 +11,8 @@ export function LoginForm() {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   }
 
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault();
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
     dispatch(loginUser(formData));
   }
 
@@ -25,7 +25,10 @@ export function LoginForm() {
         onSubmit={handleSubmit}
       >
         <Row className="bg-info border">
-          <h6 className="m-1 " style={{ fontFamily: "Balsamiq sans" }}>
+          <h6
+            className="m-1 text-white"
+            style={{ fontFamily: "Balsamiq sans" }}
+          >
             Sign in
           </h6>
         </Row>
