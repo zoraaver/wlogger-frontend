@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { App } from "./components/App";
 import { BrowserRouter as Router } from "react-router-dom";
-import { usersReducer } from "./slices/usersSlice";
+import { userReducer } from "./slices/usersSlice";
 import {
   Provider,
   TypedUseSelectorHook,
@@ -14,7 +14,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const store = configureStore({
   reducer: {
-    users: usersReducer,
+    user: userReducer,
   },
 });
 
