@@ -4,6 +4,7 @@ import axios, { AxiosResponse } from "axios";
 const BACKEND_URL = "http://localhost:8080";
 const BASE_URL = BACKEND_URL;
 const LOGIN_URL = BASE_URL + "/auth/login";
+const GOOGLE_LOGIN_URL = BASE_URL + "/auth/google";
 
 interface userFormData {
   email: string;
@@ -18,10 +19,27 @@ export const loginUser = createAsyncThunk(
         LOGIN_URL,
         formData
       );
-      localStorage.setItem("wloggerUserToken", response.data.user.token);
+      localStorage.setItem("token", response.data.user.token);
       return response.data.user;
     } catch (error) {
-      return Promise.reject(error.response.data);
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
+
+export const googleLoginUser = createAsyncThunk(
+  "users/googleLoginUser",
+  async (idToken: string) => {
+    try {
+      const response: AxiosResponse<{
+        user: userData;
+      }> = await axios.post(GOOGLE_LOGIN_URL, { idToken });
+      localStorage.setItem("token", response.data.user.token);
+      return response.data.user;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
     }
   }
 );
@@ -33,12 +51,14 @@ interface userData {
 
 interface userState {
   loginError: string | undefined;
+  authenticationStatus: "pending" | "confirmed" | "unknown";
   data: userData | null;
 }
 
 const initialState: userState = {
   data: null,
   loginError: undefined,
+  authenticationStatus: "unknown",
 };
 
 export const slice = createSlice({
@@ -49,14 +69,35 @@ export const slice = createSlice({
     builder.addCase(loginUser.rejected, (state, action) => {
       state.data = null;
       state.loginError = action.error.message;
+      state.authenticationStatus = "unknown";
     });
     builder.addCase(
       loginUser.fulfilled,
       (state, action: PayloadAction<userData>) => {
         const userData = action.payload;
         state.data = userData;
+        state.authenticationStatus = "confirmed";
       }
     );
+    builder.addCase(loginUser.pending, (state, action) => {
+      state.authenticationStatus = "pending";
+    });
+    builder.addCase(
+      googleLoginUser.fulfilled,
+      (state, action: PayloadAction<userData>) => {
+        const userData = action.payload;
+        state.data = userData;
+        state.authenticationStatus = "confirmed";
+      }
+    );
+    builder.addCase(googleLoginUser.rejected, (state, action) => {
+      state.data = null;
+      state.loginError = action.error.message;
+      state.authenticationStatus = "unknown";
+    });
+    builder.addCase(googleLoginUser.pending, (state, action) => {
+      state.authenticationStatus = "pending";
+    });
   },
 });
 
