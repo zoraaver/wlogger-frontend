@@ -5,6 +5,7 @@ const BACKEND_URL = "http://localhost:8080";
 const BASE_URL = BACKEND_URL;
 const LOGIN_URL = BASE_URL + "/auth/login";
 const GOOGLE_LOGIN_URL = BASE_URL + "/auth/google";
+const VALIDATE_URL = BASE_URL + "/auth/validate";
 
 interface userFormData {
   email: string;
@@ -43,6 +44,20 @@ export const googleLoginUser = createAsyncThunk(
     }
   }
 );
+
+export const validate = createAsyncThunk("users/validate", async () => {
+  try {
+    const response: AxiosResponse<{
+      user: userData;
+    }> = await axios.get(VALIDATE_URL, {
+      headers: { Authorisation: localStorage.token },
+    });
+    return response.data.user;
+  } catch (error) {
+    if (error.response) return Promise.reject(error.response.data);
+    return Promise.reject(error);
+  }
+});
 
 interface userData {
   email: string;
@@ -97,6 +112,21 @@ export const slice = createSlice({
     });
     builder.addCase(googleLoginUser.pending, (state, action) => {
       state.authenticationStatus = "pending";
+    });
+    builder.addCase(
+      validate.fulfilled,
+      (state, action: PayloadAction<userData>) => {
+        const userData = action.payload;
+        state.data = userData;
+        state.authenticationStatus = "confirmed";
+      }
+    );
+    builder.addCase(validate.pending, (state, action) => {
+      state.authenticationStatus = "pending";
+    });
+    builder.addCase(validate.rejected, (state, action) => {
+      state.data = null;
+      state.authenticationStatus = "unknown";
     });
   },
 });
