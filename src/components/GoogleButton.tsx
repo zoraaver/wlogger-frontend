@@ -5,12 +5,20 @@ import {
   GoogleLoginResponse,
   GoogleLoginResponseOffline,
 } from "react-google-login";
+import { useAppDispatch } from "..";
+import { googleLoginUser } from "../slices/usersSlice";
 
 export function GoogleButton() {
+  const dispatch = useAppDispatch();
+
   function responseGoogle(
     response: GoogleLoginResponse | GoogleLoginResponseOffline
   ): void {
-    console.log(response);
+    if ((response as GoogleLoginResponse).tokenId) {
+      dispatch(googleLoginUser((response as GoogleLoginResponse).tokenId));
+    } else {
+      console.log(response.code);
+    }
   }
 
   const GOOGLE_CLIENT_ID: string =
