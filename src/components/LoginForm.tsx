@@ -6,6 +6,7 @@ import { loginUser } from "../slices/usersSlice";
 
 export function LoginForm() {
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const dispatch = useAppDispatch();
 
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
     setFormData({ ...formData, [event.target.name]: event.target.value });
@@ -16,21 +17,18 @@ export function LoginForm() {
     dispatch(loginUser(formData));
   }
 
-  const dispatch = useAppDispatch();
-
   return (
     <>
       <Form
-        className="shadow px-3 w-50 pb-3 rounded bg-light bg-gradient"
+        className="shadow w-50 pb-3 rounded bg-light bg-gradient"
+        style={{ paddingLeft: "14px", paddingRight: "14px" }}
         onSubmit={handleSubmit}
       >
-        <Row className="bg-info border">
-          <h6
-            className="m-1 text-white"
-            style={{ fontFamily: "Balsamiq sans" }}
-          >
-            Sign in
-          </h6>
+        <Row
+          className="bg-info"
+          style={{ fontFamily: "Balsamiq Sans", paddingLeft: "10px" }}
+        >
+          <h6 className="m-1 text-white">Sign in</h6>
         </Row>
         <Row>
           <Col>
@@ -56,7 +54,9 @@ export function LoginForm() {
               Login
             </Button>
           </Col>
-          <div style={{ borderLeft: "4px solid lightgrey" }}></div>
+          <div
+            style={{ borderLeft: "4px solid lightgrey", marginTop: "10px" }}
+          ></div>
           <Col
             style={{
               display: "flex",
