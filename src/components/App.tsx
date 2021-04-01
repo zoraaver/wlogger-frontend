@@ -12,7 +12,7 @@ export function App() {
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
-    dispatch(validate());
+    if (localStorage.token) dispatch(validate());
   }, []);
 
   switch (authenticationStatus) {

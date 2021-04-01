@@ -3,10 +3,16 @@ import { Button, Col, Form, Row } from "react-bootstrap";
 import { GoogleButton } from "./GoogleButton";
 import { useAppDispatch } from "../index";
 import { loginUser } from "../slices/usersSlice";
+import { SignupModal } from "./SignupModal";
+import { VerticalDivider } from "./VerticalDivider";
 
 export function LoginForm() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const dispatch = useAppDispatch();
+
+  const [show, setShow] = React.useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
     setFormData({ ...formData, [event.target.name]: event.target.value });
@@ -19,6 +25,7 @@ export function LoginForm() {
 
   return (
     <>
+      <SignupModal handleClose={handleClose} show={show} />
       <Form
         className="shadow w-50 pb-3 rounded bg-light bg-gradient"
         style={{ paddingLeft: "14px", paddingRight: "14px" }}
@@ -28,7 +35,7 @@ export function LoginForm() {
           className="bg-info"
           style={{ fontFamily: "Balsamiq Sans", paddingLeft: "10px" }}
         >
-          <h6 className="m-1 text-white">Sign in</h6>
+          <h5 className="m-1 text-white">Sign in</h5>
         </Row>
         <Row>
           <Col>
@@ -36,6 +43,7 @@ export function LoginForm() {
               <Form.Label>Email address</Form.Label>
               <Form.Control
                 name="email"
+                value={formData.email}
                 onChange={handleChange}
                 type="email"
                 placeholder="email"
@@ -46,6 +54,7 @@ export function LoginForm() {
               <Form.Control
                 name="password"
                 onChange={handleChange}
+                value={formData.password}
                 type="password"
                 placeholder="password"
               />
@@ -53,10 +62,12 @@ export function LoginForm() {
             <Button className="py-1" variant="primary" type="submit">
               Login
             </Button>
+            <br></br>
+            <Button variant="link" onClick={handleShow} className="mt-2">
+              Don't have an account? Sign up here
+            </Button>
           </Col>
-          <div
-            style={{ borderLeft: "4px solid lightgrey", marginTop: "10px" }}
-          ></div>
+          <VerticalDivider text="or" thickness={4} />
           <Col
             style={{
               display: "flex",
@@ -64,7 +75,7 @@ export function LoginForm() {
               justifyContent: "space-evenly",
             }}
           >
-            <GoogleButton />
+            <GoogleButton text="Sign in with Google" width={240} />
           </Col>
         </Row>
       </Form>
