@@ -1,5 +1,7 @@
 import * as React from "react";
-import { Button, Col, Form, Modal } from "react-bootstrap";
+import { Alert, Button, Col, Form, Modal } from "react-bootstrap";
+import { useAppDispatch, useAppSelector } from "..";
+import { signupUser } from "../slices/usersSlice";
 import { GoogleButton } from "./GoogleButton";
 import { HorizontalDivider } from "./HorizontalDivider";
 
@@ -19,9 +21,14 @@ export function SignupModal({ handleClose, show }: SignupModalProps) {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   }
 
+  const dispatch = useAppDispatch();
+  const errorField = useAppSelector((state) => state.user.signupError?.field);
+  const error = useAppSelector((state) => state.user.signupError?.error);
+  const successMessage = useAppSelector((state) => state.user.signupSuccess);
+
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    console.log(formData);
+    dispatch(signupUser(formData));
   }
 
   return (
@@ -34,13 +41,14 @@ export function SignupModal({ handleClose, show }: SignupModalProps) {
       <Modal.Body className="bg-light">
         <Col>
           <Form
+            noValidate
+            validated={!!successMessage}
             onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "stretch",
-            }}
+            className="d-flex flex-column align-items-stretch"
           >
+            {successMessage ? (
+              <Alert variant="success">{successMessage}</Alert>
+            ) : null}
             <Form.Group controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
               <Form.Control
@@ -50,6 +58,9 @@ export function SignupModal({ handleClose, show }: SignupModalProps) {
                 placeholder="email"
                 value={formData.email}
               />
+              {errorField === "email" ? (
+                <div className="text-danger">{error}</div>
+              ) : null}
             </Form.Group>
             <Form.Group controlId="formBasicPassword">
               <Form.Label>Password</Form.Label>
@@ -60,6 +71,9 @@ export function SignupModal({ handleClose, show }: SignupModalProps) {
                 placeholder="password"
                 value={formData.password}
               />
+              {errorField === "password" ? (
+                <div className="text-danger">{error}</div>
+              ) : null}
             </Form.Group>
             <Form.Group controlId="formBasicConfirmPassword">
               <Form.Label>Confirm password</Form.Label>
@@ -70,6 +84,9 @@ export function SignupModal({ handleClose, show }: SignupModalProps) {
                 placeholder="Confirm password"
                 value={formData.confirmPassword}
               />
+              {errorField === "confirmPassword" ? (
+                <div className="text-danger">{error}</div>
+              ) : null}
             </Form.Group>
             <Button className="py-1" variant="success" type="submit">
               Sign up
