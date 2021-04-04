@@ -18,14 +18,10 @@ const store = configureStore({
   },
 });
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+type RootState = ReturnType<typeof store.getState>;
+type AppDispatch = typeof store.dispatch;
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
-
-const root: HTMLDivElement = document.getElementById("root") as HTMLDivElement;
-root.style.height = "100%";
-root.style.width = "100%";
 
 ReactDOM.render(
   <Provider store={store}>
