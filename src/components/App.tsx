@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Spinner } from "react-bootstrap";
 import { useAppSelector, useAppDispatch } from "..";
-import { validate } from "../slices/usersSlice";
+import { validateUser } from "../slices/usersSlice";
 import { AuthenticatedApp } from "./AuthenticatedApp";
 import { UnauthenticatedApp } from "./UnauthenticatedApp";
 
@@ -12,7 +12,7 @@ export function App() {
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
-    if (localStorage.token) dispatch(validate());
+    if (localStorage.token) dispatch(validateUser());
   }, []);
 
   switch (authenticationStatus) {
