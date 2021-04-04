@@ -6,12 +6,9 @@ export function LoginPage() {
   return (
     <Container
       fluid
-      className="vh-100"
+      className="vh-100 d-flex justify-content-left align-items-center"
       style={{
         backgroundColor: "powderblue",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "left",
       }}
     >
       <div style={{ fontFamily: "Balsamiq Sans" }} className="ml-5">
