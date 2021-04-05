@@ -92,7 +92,7 @@ export function SignupModal({ handleClose, show }: SignupModalProps) {
               Sign up
             </Button>
           </Form>
-          <HorizontalDivider text="or" thickness={4} />
+          <HorizontalDivider text="or" thickness={4} marginTop={25} />
           <GoogleButton text="Sign up with Google" />
         </Col>
       </Modal.Body>

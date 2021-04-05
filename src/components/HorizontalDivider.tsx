@@ -3,14 +3,19 @@ import * as React from "react";
 interface HorizontalDividerProps {
   text: string;
   thickness: number;
+  marginTop: number;
 }
 
-export function HorizontalDivider({ text, thickness }: HorizontalDividerProps) {
+export function HorizontalDivider({
+  text,
+  thickness,
+  marginTop,
+}: HorizontalDividerProps) {
   return (
     <div
       style={{
         borderTop: `${thickness}px solid lightgrey`,
-        marginTop: "25px",
+        marginTop,
         display: "flex",
         justifyContent: "center",
       }}
