@@ -1,13 +1,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
+import { API } from "../config/axios.config";
 
-const BACKEND_URL = "http://localhost:8080";
-const BASE_URL = BACKEND_URL;
-const LOGIN_URL = BASE_URL + "/auth/login";
-const GOOGLE_LOGIN_URL = BASE_URL + "/auth/google";
-const VALIDATE_URL = BASE_URL + "/auth/validate";
-const VERIFY_URL = BASE_URL + "/auth/verify";
-const USERS_URL = BASE_URL + "/users";
+const loginUrl = "/auth/login";
+const googleLoginUrl = "/auth/google";
+const validateUrl = "/auth/validate";
+const verifyUrl = "/auth/verify";
+const usersUrl = "/users";
 
 interface userLoginData {
   email: string;
@@ -27,8 +26,8 @@ export const loginUser = createAsyncThunk(
   "users/loginUser",
   async (formData: userLoginData) => {
     try {
-      const response: AxiosResponse<{ user: userData }> = await axios.post(
-        LOGIN_URL,
+      const response: AxiosResponse<{ user: userData }> = await API.post(
+        loginUrl,
         formData
       );
       localStorage.setItem("token", response.data.user.token);
@@ -46,7 +45,7 @@ export const googleLoginUser = createAsyncThunk(
     try {
       const response: AxiosResponse<{
         user: userData;
-      }> = await axios.post(GOOGLE_LOGIN_URL, { idToken });
+      }> = await API.post(googleLoginUrl, { idToken });
       localStorage.setItem("token", response.data.user.token);
       return response.data.user;
     } catch (error) {
@@ -60,9 +59,7 @@ export const validateUser = createAsyncThunk("users/validate", async () => {
   try {
     const response: AxiosResponse<{
       user: userData;
-    }> = await axios.get(VALIDATE_URL, {
-      headers: { Authorisation: localStorage.token },
-    });
+    }> = await API.get(validateUrl);
     return response.data.user;
   } catch (error) {
     if (error.response) return Promise.reject(error.response.data);
@@ -74,8 +71,8 @@ export const verifyUser = createAsyncThunk(
   "users/verify",
   async (verificationToken: string) => {
     try {
-      const response: AxiosResponse<{ user: userData }> = await axios.post(
-        VERIFY_URL,
+      const response: AxiosResponse<{ user: userData }> = await API.post(
+        verifyUrl,
         {
           verificationToken,
         }
@@ -95,7 +92,7 @@ export const signupUser = createAsyncThunk(
     try {
       const response: AxiosResponse<{
         user: { email: string };
-      }> = await axios.post(USERS_URL, formData);
+      }> = await API.post(usersUrl, formData);
       return response.data.user.email;
     } catch (error) {
       if (error.response) return rejectWithValue(error.response.data);
@@ -203,6 +200,7 @@ const slice = createSlice({
       signupUser.fulfilled,
       (state, action: PayloadAction<string>) => {
         state.signupSuccess = `Account successfully created: a verification email has been sent to ${action.payload}`;
+        state.signupError = undefined;
       }
     );
     builder.addCase(
