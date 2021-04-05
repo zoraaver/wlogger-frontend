@@ -4,6 +4,7 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import { HomePage } from "../pages/HomePage";
 import { NotFoundPage } from "../pages/NotFoundPage";
 import { Sidebar } from "./Sidebar/Sidebar";
+import { NewWorkoutPlanPage } from "../pages/NewWorkoutPlanPage";
 
 export function AuthenticatedApp() {
   return (
@@ -16,6 +17,9 @@ export function AuthenticatedApp() {
         </Route>
         <Route exact path="/login">
           <Redirect to="/" />
+        </Route>
+        <Route exact path="/plans/new">
+          <NewWorkoutPlanPage />
         </Route>
         <Route path="*">
           <NotFoundPage />
