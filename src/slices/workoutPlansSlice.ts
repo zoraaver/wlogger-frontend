@@ -17,6 +17,22 @@ export interface weekData {
   repeat: number;
 }
 
+export interface exerciseData {
+  name: string;
+  restInterval?: number;
+  sets: number;
+  repetitions?: number;
+  weight?: number;
+  unit: weightUnit;
+}
+
+export interface workoutData {
+  dayOfWeek: Day;
+  exercises: Array<exerciseData>;
+}
+
+export type weightUnit = "kg" | "lb";
+
 export type Day =
   | "Monday"
   | "Tuesday"
@@ -26,9 +42,15 @@ export type Day =
   | "Saturday"
   | "Sunday";
 
-export interface workoutData {
-  dayOfWeek: Day;
-}
+const daysToNumbers: { [dayOfWeek: string]: number } = {
+  Monday: 0,
+  Tuesday: 1,
+  Wednesday: 2,
+  Thursday: 3,
+  Friday: 4,
+  Saturday: 5,
+  Sunday: 6,
+};
 
 interface workoutPlanState {
   data: Array<workoutPlanData>;
@@ -78,7 +100,34 @@ const slice = createSlice({
       if (weekIndex !== undefined && weekIndex >= 0) {
         state.editWorkoutPlan?.weeks[weekIndex].workouts.push({
           dayOfWeek: day,
+          exercises: [],
         });
+        state.editWorkoutPlan?.weeks[weekIndex].workouts.sort(
+          (a, b) => daysToNumbers[a.dayOfWeek] - daysToNumbers[b.dayOfWeek]
+        );
+      }
+    },
+    addExercise(
+      state,
+      action: PayloadAction<{
+        position: number;
+        day: Day;
+        exerciseData: exerciseData;
+      }>
+    ) {
+      const { position, day, exerciseData } = action.payload;
+      const weekIndex:
+        | number
+        | undefined = state.editWorkoutPlan?.weeks.findIndex(
+        (week: weekData) => week.position === position
+      );
+      if (weekIndex !== undefined && weekIndex >= 0) {
+        const workout = state.editWorkoutPlan?.weeks[weekIndex].workouts.find(
+          (w: workoutData) => w.dayOfWeek === day
+        );
+        if (workout) {
+          workout.exercises.push(exerciseData);
+        }
       }
     },
   },
@@ -90,4 +139,9 @@ const slice = createSlice({
 });
 
 export const workoutPlansReducer = slice.reducer;
-export const { setInitialWorkoutPlanData, addWeek, addWorkout } = slice.actions;
+export const {
+  setInitialWorkoutPlanData,
+  addWeek,
+  addWorkout,
+  addExercise,
+} = slice.actions;

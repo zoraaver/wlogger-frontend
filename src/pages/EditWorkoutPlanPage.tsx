@@ -9,6 +9,7 @@ import {
   weekData,
   addWeek,
 } from "../slices/workoutPlansSlice";
+import { Week } from "../components/Week";
 
 export function EditWorkoutPlanPage() {
   const workoutPlanData = useAppSelector(
@@ -34,7 +35,10 @@ export function EditWorkoutPlanPage() {
   }
 
   function renderAddWeek(): JSX.Element {
-    if (calculateLength(workoutPlanData) >= workoutPlanData.length) {
+    if (
+      calculateLength(workoutPlanData) >= workoutPlanData.length &&
+      workoutPlanData.length
+    ) {
       return <></>;
     }
     return (
@@ -51,11 +55,14 @@ export function EditWorkoutPlanPage() {
         <Card.Body>
           <Card.Title>{name}</Card.Title>
           <Card.Text>
-            <strong>Length:</strong> {length} weeks
+            <strong>Length:</strong> {length ? length + " weeks" : "indefinite"}
           </Card.Text>
         </Card.Body>
       </Card>
       {renderAddWeek()}
+      {workoutPlanData.weeks.map((week: weekData) => (
+        <Week weekData={week} key={week.position} />
+      ))}
     </Container>
   );
 }
