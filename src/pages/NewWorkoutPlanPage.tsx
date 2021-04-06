@@ -8,9 +8,9 @@ export function NewWorkoutPlanPage() {
   return (
     <Container
       fluid
-      className="vh-100 justify-content-center align-items-center d-flex flex-column mb-3"
+      className="mt-5 justify-content-center align-items-center d-flex flex-column mb-3"
     >
-      <Card className="w-50 bg-light">
+      <Card className="w-50 bg-light mt-3">
         <Card.Body>
           <Card.Title>New workout plan</Card.Title>
           <HorizontalDivider text="" thickness={4} marginTop={10} />

@@ -1,24 +1,29 @@
 import * as React from "react";
 import Form from "react-bootstrap/Form";
-import { postWorkoutPlan, workoutPlanData } from "../slices/workoutPlansSlice";
+import {
+  setInitialWorkoutPlanData,
+  workoutPlanData,
+} from "../slices/workoutPlansSlice";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import { useAppDispatch } from "..";
-// import {useHistory} from 'react-router-dom';
+import { useHistory } from "react-router-dom";
 
 export function WorkoutPlanForm() {
   const dispatch = useAppDispatch();
-  // const history = useHistory();
+  const history = useHistory();
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    dispatch(postWorkoutPlan(formData));
+    dispatch(setInitialWorkoutPlanData(formData));
+    history.push("/plans/new/weeks");
   }
 
   const [formData, setFormData] = React.useState<workoutPlanData>({
     name: "",
     length: 0,
     current: false,
+    weeks: [],
   });
 
   function handleChange({ target }: React.ChangeEvent<HTMLInputElement>) {
@@ -65,7 +70,7 @@ export function WorkoutPlanForm() {
             value={Number(formData.current)}
             onChange={handleChange}
           />
-          <Button className="py-1 mt-2" variant="primary" type="submit">
+          <Button className="py-1 mt-2" variant="success" type="submit">
             Next
           </Button>
         </Col>
