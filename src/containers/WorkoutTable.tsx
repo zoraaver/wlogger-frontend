@@ -34,7 +34,7 @@ export function WorkoutTable({ workouts }: WorkoutTableProps) {
     });
   }
   return (
-    <Table striped bordered size="sm">
+    <Table striped bordered size="sm" className="mb-0">
       <thead>
         <tr>
           <th>Day</th>
