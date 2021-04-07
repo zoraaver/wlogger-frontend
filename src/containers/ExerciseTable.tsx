@@ -1,12 +1,13 @@
 import * as React from "react";
-import { exerciseData } from "../slices/workoutPlansSlice";
+import { exerciseData, workoutData } from "../slices/workoutPlansSlice";
 import Table from "react-bootstrap/Table";
 import { ExerciseRow } from "../components/ExerciseRow";
 
 interface ExerciseTableProps {
-  exercises: exerciseData[];
+  workout: workoutData;
+  weekPosition: number;
 }
-export function ExerciseTable({ exercises }: ExerciseTableProps) {
+export function ExerciseTable({ workout, weekPosition }: ExerciseTableProps) {
   return (
     <Table striped bordered>
       <thead>
@@ -17,8 +18,14 @@ export function ExerciseTable({ exercises }: ExerciseTableProps) {
         </tr>
       </thead>
       <tbody>
-        {exercises.map((exerciseData: exerciseData, index: number) => (
-          <ExerciseRow key={index} exerciseData={exerciseData} />
+        {workout.exercises.map((exerciseData: exerciseData, index: number) => (
+          <ExerciseRow
+            key={index}
+            exerciseData={exerciseData}
+            weekPosition={weekPosition}
+            index={index}
+            day={workout.dayOfWeek}
+          />
         ))}
       </tbody>
     </Table>
