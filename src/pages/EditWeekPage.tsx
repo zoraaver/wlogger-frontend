@@ -5,17 +5,17 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Alert from "react-bootstrap/Alert";
-import Accordion from "react-bootstrap/Accordion";
 import { Redirect, useParams, useHistory } from "react-router";
 import { useAppDispatch, useAppSelector } from "..";
 import {
   addWorkout,
   Day,
+  deleteEmptyWorkouts,
   weekData,
   workoutData,
 } from "../slices/workoutPlansSlice";
-import { ExerciseForm } from "../components/ExerciseForm";
-import { ExerciseTable } from "../containers/ExerciseTable";
+import { ArrowLeft } from "react-bootstrap-icons";
+import { WorkoutCard } from "../containers/WorkoutCard";
 
 export function EditWeekPage() {
   const position: number = Number(useParams<{ position: string }>().position);
@@ -58,7 +58,13 @@ export function EditWeekPage() {
     if (!days.includes(value as Day, 0)) return;
     setDay(value as Day);
   }
+
   const history = useHistory();
+
+  function handleBackClick() {
+    dispatch(deleteEmptyWorkouts(position));
+    history.goBack();
+  }
 
   return (
     <Container
@@ -66,7 +72,8 @@ export function EditWeekPage() {
       style={{ marginLeft: 200 }}
     >
       <h3 className="my-4">Week {position}</h3>
-      <Button onClick={() => history.goBack()} className="mr-auto">
+      <Button onClick={handleBackClick} className="mr-auto">
+        <ArrowLeft className="mr-1" />
         Back
       </Button>
       <Card className="w-75">
@@ -102,30 +109,7 @@ export function EditWeekPage() {
         </Card.Body>
       </Card>
       {workouts.map((workout) => {
-        return (
-          <Accordion
-            key={workout.dayOfWeek}
-            className="w-75 my-1"
-            defaultActiveKey="0"
-          >
-            <Card>
-              <Card.Header className="text-center">
-                <Accordion.Toggle as={Button} variant="link" eventKey="0">
-                  {workout.dayOfWeek}
-                </Accordion.Toggle>
-              </Card.Header>
-              <Accordion.Collapse eventKey="0">
-                <Card.Body>
-                  <ExerciseTable exercises={workout.exercises} />
-                  <ExerciseForm
-                    dayOfWeek={workout.dayOfWeek}
-                    position={position}
-                  />
-                </Card.Body>
-              </Accordion.Collapse>
-            </Card>
-          </Accordion>
-        );
+        return <WorkoutCard position={position} workout={workout} />;
       })}
     </Container>
   );
