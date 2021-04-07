@@ -15,8 +15,12 @@ export function WorkoutPlanForm() {
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    dispatch(setInitialWorkoutPlanData(formData));
-    history.push("/plans/new/weeks");
+    if (formData.name === "") {
+      setError("Name is a required field");
+    } else {
+      dispatch(setInitialWorkoutPlanData(formData));
+      history.push("/plans/new/weeks");
+    }
   }
 
   const [formData, setFormData] = React.useState<workoutPlanData>({
@@ -25,6 +29,7 @@ export function WorkoutPlanForm() {
     current: false,
     weeks: [],
   });
+  const [error, setError] = React.useState("");
 
   function handleChange({ target }: React.ChangeEvent<HTMLInputElement>) {
     if (target.name === "length") {
@@ -52,6 +57,7 @@ export function WorkoutPlanForm() {
               type="name"
               placeholder="name"
             />
+            {error ? <div className="text-danger">{error}</div> : null}
           </Form.Group>
           <Form.Group controlId="formBasicLength">
             <Form.Label>Length (in weeks)</Form.Label>
