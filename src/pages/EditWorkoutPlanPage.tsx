@@ -1,22 +1,51 @@
 import * as React from "react";
-import { Redirect, useHistory } from "react-router";
+import { Redirect, useHistory, useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "..";
+import Alert from "react-bootstrap/Alert";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
 import {
   workoutPlanData,
   weekData,
   addWeek,
+  postWorkoutPlan,
+  getWorkoutPlan,
+  patchWorkoutPlan,
+  resetSuccess,
 } from "../slices/workoutPlansSlice";
 import { Week } from "../components/Week";
 
 export function EditWorkoutPlanPage() {
+  const history = useHistory();
+  const { id } = useParams<{ id: string }>();
+  const dispatch = useAppDispatch();
+
   const workoutPlanData = useAppSelector(
     (state) => state.workoutPlans.editWorkoutPlan
   ) as workoutPlanData;
-  if (!workoutPlanData) {
+  const successMessage: string | undefined = useAppSelector(
+    (state) => state.workoutPlans.success
+  );
+
+  React.useEffect(() => {
+    if (id && !workoutPlanData) {
+      dispatch(getWorkoutPlan(id));
+    }
+  }, [id]);
+
+  if (!id && !workoutPlanData) {
     return <Redirect to="/plans/new" />;
+  } else if (id && !workoutPlanData) {
+    return (
+      <Spinner
+        animation="border"
+        style={{ position: "fixed", top: "50%", left: "50%" }}
+      >
+        <span className="sr-only">Loading...</span>
+      </Spinner>
+    );
   }
 
   function calculateLength(workoutPlanData: workoutPlanData): number {
@@ -25,13 +54,20 @@ export function EditWorkoutPlanPage() {
     }, 0);
   }
 
-  const history = useHistory();
-  const dispatch = useAppDispatch();
-
-  function handleAddWeek() {
+  function handleAddClick() {
     const currentPosition: number = workoutPlanData.weeks.length + 1;
     dispatch(addWeek({ position: currentPosition, repeat: 0, workouts: [] }));
     history.push(`/plans/new/weeks/${currentPosition}`);
+  }
+
+  async function handleSaveClick() {
+    if (id) {
+      await dispatch(patchWorkoutPlan(workoutPlanData));
+      dispatch(resetSuccess(4));
+    } else {
+      await dispatch(postWorkoutPlan(workoutPlanData));
+      dispatch(resetSuccess(4));
+    }
   }
 
   function renderAddWeek(): JSX.Element {
@@ -42,7 +78,7 @@ export function EditWorkoutPlanPage() {
       return <></>;
     }
     return (
-      <Button onClick={handleAddWeek} variant="success" className="mt-2">
+      <Button onClick={handleAddClick} variant="success" className="mt-2">
         + week
       </Button>
     );
@@ -56,6 +92,18 @@ export function EditWorkoutPlanPage() {
           <Card.Title>{name}</Card.Title>
           <Card.Text>
             <strong>Length:</strong> {length ? length + " weeks" : "indefinite"}
+            <Button
+              variant="primary"
+              className="d-inline-block mx-4 mb-1 py-1"
+              onClick={handleSaveClick}
+            >
+              {workoutPlanData._id ? "Update" : "Create"}
+            </Button>
+            {successMessage ? (
+              <Alert className="d-inline-block mb-1 py-1" variant="success">
+                {successMessage}
+              </Alert>
+            ) : null}
           </Card.Text>
         </Card.Body>
       </Card>

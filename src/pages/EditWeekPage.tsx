@@ -1,6 +1,7 @@
 import * as React from "react";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
+import Spinner from "react-bootstrap/Spinner";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
@@ -11,6 +12,7 @@ import {
   addWorkout,
   Day,
   deleteEmptyWorkouts,
+  getWorkoutPlan,
   weekData,
   workoutData,
 } from "../slices/workoutPlansSlice";
@@ -18,15 +20,42 @@ import { ArrowLeft } from "react-bootstrap-icons";
 import { WorkoutCard } from "../containers/WorkoutCard";
 
 export function EditWeekPage() {
-  const position: number = Number(useParams<{ position: string }>().position);
+  const { position: paramsPosition, id } = useParams<{
+    position: string;
+    id?: string;
+  }>();
+  const position = Number(paramsPosition);
+
+  const [day, setDay] = React.useState<Day>("Monday");
+  const [alert, setAlert] = React.useState(false);
+  const history = useHistory();
   const week = useAppSelector((state) =>
     state.workoutPlans.editWorkoutPlan?.weeks.find(
       (week: weekData) => week.position === position
     )
   ) as weekData;
 
-  if (!week) return <Redirect to="/plans/new/weeks" />;
+  const dispatch = useAppDispatch();
+  React.useEffect(() => {
+    if (id && !week) {
+      dispatch(getWorkoutPlan(id));
+    }
+  }, [id]);
 
+  if (!week && !id) {
+    return <Redirect to="/plans/new/weeks" />;
+  } else if (!week && id) {
+    return (
+      <Spinner
+        animation="border"
+        style={{ position: "fixed", top: "50%", left: "50%" }}
+      >
+        <span className="sr-only">Loading...</span>
+      </Spinner>
+    );
+  }
+
+  const workouts: workoutData[] = week.workouts;
   const days: Day[] = [
     "Monday",
     "Tuesday",
@@ -37,11 +66,6 @@ export function EditWeekPage() {
     "Sunday",
   ];
 
-  const workouts: workoutData[] = week.workouts;
-  const [day, setDay] = React.useState<Day>("Monday");
-  const [alert, setAlert] = React.useState(false);
-
-  const dispatch = useAppDispatch();
   function handleAddWorkout(event: React.FormEvent) {
     event.preventDefault();
     if (week.workouts.map((workout) => workout.dayOfWeek).includes(day, 0)) {
@@ -59,11 +83,9 @@ export function EditWeekPage() {
     setDay(value as Day);
   }
 
-  const history = useHistory();
-
   function handleBackClick() {
     dispatch(deleteEmptyWorkouts(position));
-    history.goBack();
+    history.push(`/plans/${id ? id : "new"}/weeks`);
   }
 
   return (
@@ -108,8 +130,14 @@ export function EditWeekPage() {
           </Form>
         </Card.Body>
       </Card>
-      {workouts.map((workout) => {
-        return <WorkoutCard position={position} workout={workout} />;
+      {workouts.map((workout: workoutData) => {
+        return (
+          <WorkoutCard
+            position={position}
+            workout={workout}
+            key={workout.dayOfWeek}
+          />
+        );
       })}
     </Container>
   );
