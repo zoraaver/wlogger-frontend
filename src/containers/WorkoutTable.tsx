@@ -10,6 +10,7 @@ interface WorkoutTableProps {
 export function WorkoutTable({ workouts }: WorkoutTableProps) {
   function renderRows() {
     return workouts.map((workout: workoutData) => {
+      if (workout.exercises.length === 0) return [];
       const firstExercise = workout.exercises[0];
       const firstRow: JSX.Element = (
         <tr key={-1}>
