@@ -5,6 +5,7 @@ import { API } from "../config/axios.config";
 const workoutPlansUrl = "/workoutPlans";
 
 export interface workoutPlanData {
+  _id?: string;
   name: string;
   length: number;
   current: boolean;
@@ -42,6 +43,12 @@ export type Day =
   | "Saturday"
   | "Sunday";
 
+export interface workoutPlanHeaderData {
+  name: string;
+  length: number;
+  _id: string;
+}
+
 const daysToNumbers: { [dayOfWeek: string]: number } = {
   Monday: 0,
   Tuesday: 1,
@@ -53,9 +60,10 @@ const daysToNumbers: { [dayOfWeek: string]: number } = {
 };
 
 interface workoutPlanState {
-  data: Array<workoutPlanData>;
+  data: Array<workoutPlanHeaderData>;
   error: string | undefined;
   editWorkoutPlan: workoutPlanData | undefined;
+  success: string | undefined;
 }
 
 export const postWorkoutPlan = createAsyncThunk(
@@ -74,9 +82,80 @@ export const postWorkoutPlan = createAsyncThunk(
   }
 );
 
+export const getWorkoutPlans = createAsyncThunk(
+  "workoutPlans/getWorkoutPlans",
+  async () => {
+    try {
+      const response: AxiosResponse<workoutPlanHeaderData[]> = await API.get(
+        workoutPlansUrl
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
+
+export const getWorkoutPlan = createAsyncThunk(
+  "workoutPlans/getWorkoutPlan",
+  async (_id: string) => {
+    try {
+      const response: AxiosResponse<workoutPlanData> = await API.get(
+        `${workoutPlansUrl}/${_id}`
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
+
+export const patchWorkoutPlan = createAsyncThunk(
+  "workoutPlans/patchWorkoutPlan",
+  async (workoutPlanData: workoutPlanData) => {
+    try {
+      const response: AxiosResponse<workoutPlanData> = await API.patch(
+        `${workoutPlansUrl}/${workoutPlanData._id}`,
+        workoutPlanData
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
+
+export const deleteWorkoutPlan = createAsyncThunk(
+  "workoutPlans/deleteWorkoutPlan",
+  async (_id: string) => {
+    try {
+      const response: AxiosResponse<workoutPlanData["_id"]> = await API.delete(
+        `${workoutPlansUrl}/${_id}`
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
+
+export const resetSuccess = createAsyncThunk(
+  "workoutPlans/resetSuccess",
+  async (seconds: number, { dispatch }) => {
+    setTimeout(() => {
+      dispatch(setSuccess(undefined));
+    }, 1000 * seconds);
+  }
+);
+
 const initialState: workoutPlanState = {
   data: [],
   editWorkoutPlan: undefined,
+  success: undefined,
   error: undefined,
 };
 
@@ -197,10 +276,56 @@ const slice = createSlice({
         );
       }
     },
+    setSuccess(state, action: PayloadAction<string | undefined>) {
+      state.success = action.payload;
+    },
   },
   extraReducers: (builder) => {
-    builder.addCase(postWorkoutPlan.fulfilled, (state, action) => {
-      console.log(action.payload);
+    builder.addCase(
+      postWorkoutPlan.fulfilled,
+      (state, action: PayloadAction<workoutPlanData>) => {
+        state.success = `${action.payload.name} successfully created`;
+        state.editWorkoutPlan = action.payload;
+      }
+    );
+    builder.addCase(postWorkoutPlan.rejected, (state, action) => {
+      state.success = undefined;
+    });
+    builder.addCase(getWorkoutPlans.fulfilled, (state, action) => {
+      state.data = action.payload;
+    });
+    builder.addCase(
+      getWorkoutPlan.fulfilled,
+      (state, action: PayloadAction<workoutPlanData>) => {
+        state.editWorkoutPlan = action.payload;
+      }
+    );
+    builder.addCase(getWorkoutPlan.rejected, (state, action) => {
+      state.editWorkoutPlan = undefined;
+    });
+    builder.addCase(
+      patchWorkoutPlan.fulfilled,
+      (state, action: PayloadAction<workoutPlanData>) => {
+        state.editWorkoutPlan = action.payload;
+        state.success = `${action.payload.name} successfully updated`;
+      }
+    );
+    builder.addCase(patchWorkoutPlan.rejected, (state, action) => {
+      state.editWorkoutPlan = undefined;
+    });
+    builder.addCase(
+      deleteWorkoutPlan.fulfilled,
+      (state, action: PayloadAction<workoutPlanData["_id"]>) => {
+        state.editWorkoutPlan = undefined;
+        state.data = state.data.filter(
+          (workoutPlanHeader: workoutPlanHeaderData) =>
+            workoutPlanHeader._id !== action.payload
+        );
+        state.success = `Plan successfully deleted`;
+      }
+    );
+    builder.addCase(deleteWorkoutPlan.rejected, (state, action) => {
+      state.editWorkoutPlan = undefined;
     });
   },
 });
@@ -215,4 +340,5 @@ export const {
   deleteWeek,
   deleteWorkout,
   deleteEmptyWorkouts,
+  setSuccess,
 } = slice.actions;
