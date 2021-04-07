@@ -43,7 +43,7 @@ export function EditWorkoutPlanPage() {
     }
     return (
       <Button onClick={handleAddWeek} variant="success" className="mt-2">
-        Add week
+        + week
       </Button>
     );
   }
