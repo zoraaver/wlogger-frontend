@@ -25,6 +25,7 @@ export function EditWorkoutPlanPage() {
   const workoutPlanData = useAppSelector(
     (state) => state.workoutPlans.editWorkoutPlan
   ) as workoutPlanData;
+
   const successMessage: string | undefined = useAppSelector(
     (state) => state.workoutPlans.success
   );
@@ -57,7 +58,7 @@ export function EditWorkoutPlanPage() {
   function handleAddClick() {
     const currentPosition: number = workoutPlanData.weeks.length + 1;
     dispatch(addWeek({ position: currentPosition, repeat: 0, workouts: [] }));
-    history.push(`/plans/new/weeks/${currentPosition}`);
+    history.push(`/plans/${id ? id : "new"}/weeks/${currentPosition}`);
   }
 
   async function handleSaveClick() {
@@ -66,7 +67,7 @@ export function EditWorkoutPlanPage() {
       dispatch(resetSuccess(4));
     } else {
       await dispatch(postWorkoutPlan(workoutPlanData));
-      dispatch(resetSuccess(4));
+      history.push("/plans");
     }
   }
 
