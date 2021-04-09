@@ -2,7 +2,12 @@ import * as React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
-import { addExercise, Day, exerciseData } from "../slices/workoutPlansSlice";
+import {
+  addExercise,
+  Day,
+  exerciseData,
+  weightUnit,
+} from "../slices/workoutPlansSlice";
 import { useAppDispatch } from "..";
 
 interface ExerciseFormProps {
@@ -21,10 +26,32 @@ export function ExerciseForm({ dayOfWeek, position }: ExerciseFormProps) {
   const [error, setError] = React.useState({ field: "", message: "" });
 
   function handleChange({ target }: React.ChangeEvent<HTMLInputElement>) {
-    if (target.name === "name" || target.name === "unit") {
-      setFormData({ ...formData, [target.name]: target.value });
-    } else {
-      setFormData({ ...formData, [target.name]: Number(target.value) });
+    const numberValue = Number(target.value);
+    switch (target.name) {
+      case "name":
+        setFormData({ ...formData, [target.name]: target.value });
+        return;
+      case "unit":
+        if (["kg", "lb"].includes(target.value))
+          setFormData({ ...formData, unit: target.value as weightUnit });
+        return;
+      case "sets":
+        if (Number.isInteger(numberValue) && numberValue > 0) {
+          setFormData({ ...formData, sets: numberValue });
+        }
+        return;
+      case "repetitions":
+        if (Number.isInteger(numberValue) && numberValue >= 0) {
+          setFormData({ ...formData, repetitions: numberValue });
+        }
+        return;
+      case "weight":
+        if (Number(numberValue) >= 0) {
+          setFormData({ ...formData, weight: numberValue });
+        }
+        return;
+      default:
+        return;
     }
   }
 
@@ -33,8 +60,6 @@ export function ExerciseForm({ dayOfWeek, position }: ExerciseFormProps) {
     event.preventDefault();
     if (formData.name === "") {
       setError({ field: "name", message: "Name is a required field." });
-    } else if (formData.sets === 0) {
-      setError({ field: "sets", message: "No. of sets cannot be 0" });
     } else {
       setError({ field: "", message: "" });
       dispatch(
@@ -62,18 +87,17 @@ export function ExerciseForm({ dayOfWeek, position }: ExerciseFormProps) {
           <Form.Label>Sets</Form.Label>
           <Form.Control
             name="sets"
+            type="number"
             onChange={handleChange}
             value={formData.sets}
             placeholder="sets"
           />
-          {error.field === "sets" ? (
-            <div className="text-danger">{error.message}</div>
-          ) : null}
         </Col>
         <Col>
           <Form.Label>Reps</Form.Label>
           <Form.Control
             name="repetitions"
+            type="number"
             onChange={handleChange}
             value={formData.repetitions}
             placeholder="reps"
@@ -83,6 +107,7 @@ export function ExerciseForm({ dayOfWeek, position }: ExerciseFormProps) {
           <Form.Label>Weight</Form.Label>
           <Form.Control
             name="weight"
+            type="number"
             onChange={handleChange}
             value={formData.weight}
             placeholder="weight"
