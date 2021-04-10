@@ -101,7 +101,7 @@ export function EditWorkoutPlanPage() {
               className="d-inline-block mx-4 mb-1 py-1"
               onClick={handleSaveClick}
             >
-              {workoutPlanData._id ? "Update" : "Create"}
+              {workoutPlanData._id ? "Save" : "Create"}
             </Button>
           </Card.Text>
           <Alert show={!!successMessage} variant="success">
