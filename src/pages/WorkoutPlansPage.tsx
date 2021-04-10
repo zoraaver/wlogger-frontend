@@ -9,6 +9,7 @@ import {
 } from "../slices/workoutPlansSlice";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
 
 export function WorkoutPlansPage() {
   const dispatch = useAppDispatch();
@@ -25,8 +26,8 @@ export function WorkoutPlansPage() {
     setShow(false);
   }
 
-  const workoutPlans: workoutPlanHeaderData[] = useAppSelector(
-    (state) => state.workoutPlans.data
+  const { data: workoutPlans, success: successMessage } = useAppSelector(
+    (state) => state.workoutPlans
   );
 
   React.useEffect(() => {
@@ -39,6 +40,9 @@ export function WorkoutPlansPage() {
       style={{ marginLeft: 200, marginTop: 68 }}
     >
       <h2>My plans</h2>
+      {successMessage ? (
+        <Alert variant="success">Plan successfully created</Alert>
+      ) : null}
       {workoutPlans.map((workoutPlan: workoutPlanHeaderData) => (
         <WorkoutPlanCard
           key={workoutPlan._id}

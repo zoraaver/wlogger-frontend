@@ -69,6 +69,7 @@ export function EditWorkoutPlanPage() {
       dispatch(resetSuccess(4));
     } else {
       await dispatch(postWorkoutPlan(workoutPlanData));
+      dispatch(resetSuccess(4));
       history.push("/plans");
     }
   }
