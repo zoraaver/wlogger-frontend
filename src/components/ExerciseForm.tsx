@@ -27,6 +27,10 @@ export function ExerciseForm({ dayOfWeek, position }: ExerciseFormProps) {
 
   function handleChange({ target }: React.ChangeEvent<HTMLInputElement>) {
     const numberValue = Number(target.value);
+    if (target.value === "") {
+      setFormData({ ...formData, [target.name]: target.value });
+      return;
+    }
     switch (target.name) {
       case "name":
         setFormData({ ...formData, [target.name]: target.value });
@@ -56,10 +60,21 @@ export function ExerciseForm({ dayOfWeek, position }: ExerciseFormProps) {
   }
 
   const dispatch = useAppDispatch();
+
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (formData.name === "") {
-      setError({ field: "name", message: "Name is a required field." });
+    let field: string = "";
+    // require name, sets and unit
+    if (formData.name === "") field = "name";
+    else if ((formData.sets as any) === "") field = "sets";
+    else if ((formData.unit as any) === "") field = "unit";
+
+    // default weight and repetitions to 0 if not given
+    if ((formData.repetitions as any) === "") formData.repetitions = 0;
+    if ((formData.weight as any) === "") formData.weight = 0;
+
+    if (field !== "") {
+      setError({ field, message: `${field} is a required field` });
     } else {
       setError({ field: "", message: "" });
       dispatch(
@@ -92,6 +107,9 @@ export function ExerciseForm({ dayOfWeek, position }: ExerciseFormProps) {
             value={formData.sets}
             placeholder="sets"
           />
+          {error.field === "sets" ? (
+            <div className="text-danger">{error.message}</div>
+          ) : null}
         </Col>
         <Col>
           <Form.Label>Reps</Form.Label>
