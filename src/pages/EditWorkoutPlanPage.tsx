@@ -103,12 +103,10 @@ export function EditWorkoutPlanPage() {
             >
               {workoutPlanData._id ? "Update" : "Create"}
             </Button>
-            {successMessage ? (
-              <Alert className="d-inline-block mb-1 py-1" variant="success">
-                {successMessage}
-              </Alert>
-            ) : null}
           </Card.Text>
+          <Alert show={!!successMessage} variant="success">
+            {successMessage}
+          </Alert>
         </Card.Body>
       </Card>
       {renderAddWeek()}

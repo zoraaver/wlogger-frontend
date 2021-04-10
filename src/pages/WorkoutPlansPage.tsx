@@ -5,6 +5,7 @@ import { WorkoutPlanCard } from "../components/WorkoutPlanCard";
 import {
   deleteWorkoutPlan,
   getWorkoutPlans,
+  resetSuccess,
   workoutPlanHeaderData,
 } from "../slices/workoutPlansSlice";
 import Modal from "react-bootstrap/Modal";
@@ -23,6 +24,7 @@ export function WorkoutPlansPage() {
 
   function handleDeleteClick() {
     dispatch(deleteWorkoutPlan(planToDelete._id));
+    dispatch(resetSuccess(4));
     setShow(false);
   }
 
@@ -40,9 +42,9 @@ export function WorkoutPlansPage() {
       style={{ marginLeft: 200, marginTop: 68 }}
     >
       <h2>My plans</h2>
-      {successMessage ? (
-        <Alert variant="success">Plan successfully created</Alert>
-      ) : null}
+      <Alert variant="success" show={!!successMessage}>
+        {successMessage}
+      </Alert>
       {workoutPlans.map((workoutPlan: workoutPlanHeaderData) => (
         <WorkoutPlanCard
           key={workoutPlan._id}
