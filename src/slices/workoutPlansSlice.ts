@@ -70,7 +70,7 @@ export const postWorkoutPlan = createAsyncThunk(
   "workoutPlans/postWorkoutPlan",
   async (data: workoutPlanData) => {
     try {
-      const response: AxiosResponse<any> = await API.post(
+      const response: AxiosResponse<workoutPlanData> = await API.post(
         workoutPlansUrl,
         data
       );
@@ -99,14 +99,14 @@ export const getWorkoutPlans = createAsyncThunk(
 
 export const getWorkoutPlan = createAsyncThunk(
   "workoutPlans/getWorkoutPlan",
-  async (_id: string) => {
+  async (_id: string, { rejectWithValue }) => {
     try {
       const response: AxiosResponse<workoutPlanData> = await API.get(
         `${workoutPlansUrl}/${_id}`
       );
       return response.data;
     } catch (error) {
-      if (error.response) return Promise.reject(error.response.data);
+      if (error.response) return rejectWithValue(error.response.data);
       return Promise.reject(error);
     }
   }
@@ -114,7 +114,7 @@ export const getWorkoutPlan = createAsyncThunk(
 
 export const patchWorkoutPlan = createAsyncThunk(
   "workoutPlans/patchWorkoutPlan",
-  async (workoutPlanData: workoutPlanData) => {
+  async (workoutPlanData: workoutPlanData, { rejectWithValue }) => {
     try {
       const response: AxiosResponse<workoutPlanData> = await API.patch(
         `${workoutPlansUrl}/${workoutPlanData._id}`,
@@ -122,7 +122,7 @@ export const patchWorkoutPlan = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      if (error.response) return Promise.reject(error.response.data);
+      if (error.response) return rejectWithValue(error.response.data);
       return Promise.reject(error);
     }
   }
@@ -130,14 +130,14 @@ export const patchWorkoutPlan = createAsyncThunk(
 
 export const deleteWorkoutPlan = createAsyncThunk(
   "workoutPlans/deleteWorkoutPlan",
-  async (_id: string) => {
+  async (_id: string, { rejectWithValue }) => {
     try {
       const response: AxiosResponse<workoutPlanData["_id"]> = await API.delete(
         `${workoutPlansUrl}/${_id}`
       );
       return response.data;
     } catch (error) {
-      if (error.response) return Promise.reject(error.response.data);
+      if (error.response) return rejectWithValue(error.response.data);
       return Promise.reject(error);
     }
   }
@@ -298,21 +298,31 @@ const slice = createSlice({
       getWorkoutPlan.fulfilled,
       (state, action: PayloadAction<workoutPlanData>) => {
         state.editWorkoutPlan = action.payload;
+        state.error = undefined;
       }
     );
-    builder.addCase(getWorkoutPlan.rejected, (state, action) => {
-      state.editWorkoutPlan = undefined;
-    });
+    builder.addCase(
+      getWorkoutPlan.rejected,
+      (state, action: PayloadAction<unknown>) => {
+        state.editWorkoutPlan = undefined;
+        state.error = (action.payload as { message: string }).message;
+      }
+    );
     builder.addCase(
       patchWorkoutPlan.fulfilled,
       (state, action: PayloadAction<workoutPlanData>) => {
         state.editWorkoutPlan = action.payload;
         state.success = `${action.payload.name} successfully updated`;
+        state.error = undefined;
       }
     );
-    builder.addCase(patchWorkoutPlan.rejected, (state, action) => {
-      state.editWorkoutPlan = undefined;
-    });
+    builder.addCase(
+      patchWorkoutPlan.rejected,
+      (state, action: PayloadAction<unknown>) => {
+        state.editWorkoutPlan = undefined;
+        state.error = (action.payload as { message: string }).message;
+      }
+    );
     builder.addCase(
       deleteWorkoutPlan.fulfilled,
       (state, action: PayloadAction<workoutPlanData["_id"]>) => {
@@ -322,11 +332,16 @@ const slice = createSlice({
             workoutPlanHeader._id !== action.payload
         );
         state.success = `Plan successfully deleted`;
+        state.error = undefined;
       }
     );
-    builder.addCase(deleteWorkoutPlan.rejected, (state, action) => {
-      state.editWorkoutPlan = undefined;
-    });
+    builder.addCase(
+      deleteWorkoutPlan.rejected,
+      (state, action: PayloadAction<unknown>) => {
+        state.editWorkoutPlan = undefined;
+        state.error = (action.payload as { message: string }).message;
+      }
+    );
   },
 });
 
