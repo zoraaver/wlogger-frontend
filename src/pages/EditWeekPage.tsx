@@ -21,11 +21,12 @@ import { SomethingWentWrongAlert } from "../components/SomethingWentWrongAlert";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 
 export function EditWeekPage() {
-  const { position: paramsPosition, id } = useParams<{
+  const params = useParams<{
     position: string;
     id?: string;
   }>();
-  const position = Number(paramsPosition);
+  const position: number = Number(params.position);
+  const id: string | undefined = params.id;
 
   const [day, setDay] = React.useState<Day>("Monday");
   const [alert, setAlert] = React.useState(false);
