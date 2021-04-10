@@ -18,6 +18,7 @@ import {
 } from "../slices/workoutPlansSlice";
 import { ArrowLeft } from "react-bootstrap-icons";
 import { WorkoutCard } from "../containers/WorkoutCard";
+import { SomethingWentWrongAlert } from "../components/SomethingWentWrongAlert";
 
 export function EditWeekPage() {
   const { position: paramsPosition, id } = useParams<{
@@ -34,6 +35,9 @@ export function EditWeekPage() {
       (week: weekData) => week.position === position
     )
   ) as weekData;
+  const error: string | undefined = useAppSelector(
+    (state) => state.workoutPlans.error
+  );
 
   const dispatch = useAppDispatch();
   React.useEffect(() => {
@@ -42,6 +46,10 @@ export function EditWeekPage() {
     }
   }, [id]);
 
+  // handle errors and loading status
+  if (error) {
+    return <SomethingWentWrongAlert />;
+  }
   if (!week && !id) {
     return <Redirect to="/plans/new/weeks" />;
   } else if (!week && id) {

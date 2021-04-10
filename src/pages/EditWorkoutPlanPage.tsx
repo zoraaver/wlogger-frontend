@@ -16,6 +16,7 @@ import {
   resetSuccess,
 } from "../slices/workoutPlansSlice";
 import { Week } from "../components/Week";
+import { SomethingWentWrongAlert } from "../components/SomethingWentWrongAlert";
 
 export function EditWorkoutPlanPage() {
   const history = useHistory();
@@ -30,12 +31,20 @@ export function EditWorkoutPlanPage() {
     (state) => state.workoutPlans.success
   );
 
+  const error: string | undefined = useAppSelector(
+    (state) => state.workoutPlans.error
+  );
+
   React.useEffect(() => {
     if (id && !workoutPlanData) {
       dispatch(getWorkoutPlan(id));
     }
   }, [id]);
 
+  // handle redirects if workout data is still loading or if there was an error fetching the data
+  if (error) {
+    return <SomethingWentWrongAlert />;
+  }
   if (!id && !workoutPlanData) {
     return <Redirect to="/plans/new" />;
   } else if (id && !workoutPlanData) {
