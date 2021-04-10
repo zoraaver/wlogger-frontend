@@ -5,7 +5,6 @@ import Alert from "react-bootstrap/Alert";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import Spinner from "react-bootstrap/Spinner";
 import {
   workoutPlanData,
   weekData,
@@ -17,6 +16,7 @@ import {
 } from "../slices/workoutPlansSlice";
 import { Week } from "../components/Week";
 import { SomethingWentWrongAlert } from "../components/SomethingWentWrongAlert";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 
 export function EditWorkoutPlanPage() {
   const history = useHistory();
@@ -48,14 +48,7 @@ export function EditWorkoutPlanPage() {
   if (!id && !workoutPlanData) {
     return <Redirect to="/plans/new" />;
   } else if (id && !workoutPlanData) {
-    return (
-      <Spinner
-        animation="border"
-        style={{ position: "fixed", top: "50%", left: "50%" }}
-      >
-        <span className="sr-only">Loading...</span>
-      </Spinner>
-    );
+    return <LoadingSpinner />;
   }
 
   function calculateLength(workoutPlanData: workoutPlanData): number {

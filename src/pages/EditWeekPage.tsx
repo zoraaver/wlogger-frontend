@@ -1,7 +1,6 @@
 import * as React from "react";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
-import Spinner from "react-bootstrap/Spinner";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
@@ -19,6 +18,7 @@ import {
 import { ArrowLeft } from "react-bootstrap-icons";
 import { WorkoutCard } from "../containers/WorkoutCard";
 import { SomethingWentWrongAlert } from "../components/SomethingWentWrongAlert";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 
 export function EditWeekPage() {
   const { position: paramsPosition, id } = useParams<{
@@ -53,14 +53,7 @@ export function EditWeekPage() {
   if (!week && !id) {
     return <Redirect to="/plans/new/weeks" />;
   } else if (!week && id) {
-    return (
-      <Spinner
-        animation="border"
-        style={{ position: "fixed", top: "50%", left: "50%" }}
-      >
-        <span className="sr-only">Loading...</span>
-      </Spinner>
-    );
+    return <LoadingSpinner />;
   }
 
   const workouts: workoutData[] = week.workouts;

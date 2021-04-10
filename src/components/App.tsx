@@ -1,8 +1,8 @@
 import * as React from "react";
-import { Spinner } from "react-bootstrap";
 import { useAppSelector, useAppDispatch } from "..";
 import { validateUser } from "../slices/usersSlice";
 import { AuthenticatedApp } from "./AuthenticatedApp";
+import { LoadingSpinner } from "./LoadingSpinner";
 import { UnauthenticatedApp } from "./UnauthenticatedApp";
 
 export function App() {
@@ -17,14 +17,7 @@ export function App() {
 
   switch (authenticationStatus) {
     case "pending":
-      return (
-        <Spinner
-          animation="border"
-          style={{ position: "fixed", top: "50%", left: "50%" }}
-        >
-          <span className="sr-only">Loading...</span>
-        </Spinner>
-      );
+      return <LoadingSpinner />;
     case "confirmed":
       return <AuthenticatedApp />;
     case "unknown":
