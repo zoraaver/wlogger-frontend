@@ -23,16 +23,14 @@ export function Week({ weekData: { repeat, position, workouts } }: WeekProps) {
   return (
     <Accordion className="w-75 mt-1">
       <Card>
-        <Card.Header className="w-100 d-flex flex-row justify-content-start">
+        <Card.Header className="w-100 d-flex flex-row justify-content-end">
           <Accordion.Toggle
-            className="mx-2"
+            className="mr-auto"
             as={Button}
             variant="light"
             eventKey="0"
           >
-            <h6 className="d-inline ml-0 font-weight-bold mr-2">
-              Week {position}:
-            </h6>{" "}
+            <h6 className="d-inline font-weight-bold">Week {position}:</h6>{" "}
             {workouts.length} workouts
           </Accordion.Toggle>
           <Button
@@ -44,7 +42,7 @@ export function Week({ weekData: { repeat, position, workouts } }: WeekProps) {
           >
             <Pencil />
           </Button>
-          <Button variant="danger" className="mx-2" onClick={handleDeleteClick}>
+          <Button variant="danger" onClick={handleDeleteClick}>
             <Trash />
           </Button>
         </Card.Header>
