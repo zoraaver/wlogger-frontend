@@ -3,7 +3,7 @@ import { Switch, Route } from "react-router-dom";
 import { LoginPage } from "../pages/LoginPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
 import { VerifyPage } from "../pages/VerifyPage";
-import { Navbar } from "./NavBar";
+import { Navbar } from "../containers/NavBar";
 
 export function UnauthenticatedApp() {
   return (
