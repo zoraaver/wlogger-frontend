@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom";
 import { App } from "./components/App";
 import { BrowserRouter as Router } from "react-router-dom";
 import { workoutPlansReducer } from "./slices/workoutPlansSlice";
+import { workoutLogsReducer } from "./slices/workoutLogsSlice";
 import { userReducer } from "./slices/usersSlice";
 import {
   Provider,
@@ -17,6 +18,7 @@ const store = configureStore({
   reducer: {
     user: userReducer,
     workoutPlans: workoutPlansReducer,
+    workoutLogs: workoutLogsReducer,
   },
 });
 
