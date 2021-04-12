@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Navbar } from "./NavBar";
+import { Navbar } from "../containers/NavBar";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { HomePage } from "../pages/HomePage";
 import { NotFoundPage } from "../pages/NotFoundPage";
@@ -8,6 +8,8 @@ import { NewWorkoutPlanPage } from "../pages/NewWorkoutPlanPage";
 import { EditWorkoutPlanPage } from "../pages/EditWorkoutPlanPage";
 import { EditWeekPage } from "../pages/EditWeekPage";
 import { WorkoutPlansPage } from "../pages/WorkoutPlansPage";
+import { NewWorkoutLogPage } from "../pages/NewWorkoutLogPage";
+import { WorkoutLogsPage } from "../pages/WorkoutLogsPage";
 
 export function AuthenticatedApp() {
   return (
@@ -35,6 +37,12 @@ export function AuthenticatedApp() {
         </Route>
         <Route exact path="/plans">
           <WorkoutPlansPage />
+        </Route>
+        <Route exact path="/logs/new">
+          <NewWorkoutLogPage />
+        </Route>
+        <Route exact path="/logs">
+          <WorkoutLogsPage />
         </Route>
         <Route exact path="/">
           <HomePage />
