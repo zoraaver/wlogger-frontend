@@ -1,15 +1,27 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AxiosResponse } from "axios";
+import { API } from "../config/axios.config";
 import { weightUnit } from "./workoutPlansSlice";
+
+const workoutLogUrl = "/workoutLogs";
 
 interface workoutLogData {
   exercises: Array<exerciseLogData>;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
+  _id?: string;
 }
 
 interface workoutLogState {
-  data: Array<workoutLogData>;
+  data: Array<workoutLogHeaderData>;
   editWorkoutLog?: workoutLogData;
+}
+
+interface workoutLogHeaderData {
+  createdAt: string;
+  setCount: number;
+  exerciseCount: number;
+  _id: string;
 }
 
 export interface EntryData {
@@ -17,20 +29,48 @@ export interface EntryData {
   repetitions: number;
   weight: number;
   unit: weightUnit;
-  restInterval?: number;
+  restInterval: number;
 }
 
-interface exerciseLogData {
+export interface exerciseLogData {
   name: string;
   sets: Array<setLogData>;
 }
 
-interface setLogData {
+export interface setLogData {
   weight: number;
   repetitions: number;
   restInterval?: number;
   unit: weightUnit;
 }
+
+export const postWorkoutLog = createAsyncThunk(
+  "workoutLogs/postWorkoutLog",
+  async (data: workoutLogData) => {
+    try {
+      const response: AxiosResponse<any> = await API.post(workoutLogUrl, data);
+      return response.data;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
+
+export const getWorkoutLogs = createAsyncThunk(
+  "workoutLogs/getWorkoutLogs",
+  async () => {
+    try {
+      const response: AxiosResponse<workoutLogHeaderData[]> = await API.get(
+        workoutLogUrl
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
 
 const initialState: workoutLogState = {
   data: [],
@@ -62,6 +102,23 @@ const slice = createSlice({
         });
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(
+      postWorkoutLog.fulfilled,
+      (state, action: PayloadAction<any>) => {
+        console.log(action.payload);
+      }
+    );
+    builder.addCase(postWorkoutLog.rejected, (state, action) => {
+      console.error(action.error.message);
+    });
+    builder.addCase(
+      getWorkoutLogs.fulfilled,
+      (state, action: PayloadAction<workoutLogHeaderData[]>) => {
+        state.data = action.payload;
+      }
+    );
   },
 });
 
