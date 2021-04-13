@@ -5,22 +5,32 @@ import Button from "react-bootstrap/Button";
 import { useAppDispatch } from "..";
 import { addSet, EntryData } from "../slices/workoutLogsSlice";
 import { weightUnit } from "../slices/workoutPlansSlice";
+import { renderRestInterval } from "../util/util";
 
 export function WorkoutLogForm() {
   const [formData, setFormData] = React.useState<EntryData>({
     name: "",
     repetitions: 0,
     weight: 0,
-    restInterval: 0,
+    restInterval: Date.now(),
     unit: "kg",
   });
   const [error, setError] = React.useState("");
+  const [
+    timeElapsedSinceEntryAdded,
+    setTimeElapsedSinceEntryAdded,
+  ] = React.useState(0);
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      setTimeElapsedSinceEntryAdded(Date.now() - formData.restInterval);
+    }, 1000);
+  }, [timeElapsedSinceEntryAdded]);
 
   const dispatch = useAppDispatch();
 
   function handleChange({ target }: React.ChangeEvent<HTMLInputElement>) {
     const numberValue = Number(target.value);
-    console.log(formData);
     if (target.value === "") {
       setFormData({ ...formData, [target.name]: target.value });
       return;
@@ -57,12 +67,16 @@ export function WorkoutLogForm() {
     // default weight and repetitions to 0 if none is given
     if (formData.repetitions === ("" as any)) formData.repetitions = 0;
     if (formData.weight === ("" as any)) formData.weight = 0;
+
+    formData.restInterval = (Date.now() - formData.restInterval) / 1000;
     setError("");
     dispatch(addSet(formData));
+    // reset time for new set
+    formData.restInterval = Date.now();
   }
 
   return (
-    <Form onSubmit={handleSubmit} className="w-50 mt-3">
+    <Form onSubmit={handleSubmit} className="w-75 mt-3">
       <Form.Row>
         <Col>
           <Form.Label>Name</Form.Label>
@@ -106,12 +120,19 @@ export function WorkoutLogForm() {
             <option value="lb">lb</option>
           </Form.Control>
         </Col>
+        <Col>
+          <Form.Label>Rest Interval</Form.Label>
+          <Form.Control
+            readOnly
+            value={renderRestInterval(timeElapsedSinceEntryAdded / 1000)}
+          />
+        </Col>
         <Col
           className="d-flex flex-column justify-content-end align-items-center"
           lg={50}
         >
-          <Button variant="success" type="submit">
-            Add Entry
+          <Button variant="primary" type="submit">
+            + entry
           </Button>
         </Col>
       </Form.Row>
