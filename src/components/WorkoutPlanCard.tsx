@@ -28,7 +28,7 @@ export function WorkoutPlanCard({
         <Button
           onClick={() => handleShow(_id, name)}
           variant="danger"
-          className="ml-2 mb-0 d-inline-block"
+          className="ml-2 mb-0 d-inline-block py-1 px-1"
         >
           <Trash />
         </Button>
