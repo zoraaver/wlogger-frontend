@@ -121,7 +121,7 @@ const initialState: userState = {
   verificationError: undefined,
   signupSuccess: undefined,
   signupError: undefined,
-  authenticationStatus: "unknown",
+  authenticationStatus: "pending",
 };
 
 const slice = createSlice({
