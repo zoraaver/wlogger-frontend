@@ -6,6 +6,7 @@ import { WorkoutLogTable } from "../containers/WorkoutLogTable";
 import { useAppDispatch, useAppSelector } from "..";
 import { postWorkoutLog } from "../slices/workoutLogsSlice";
 import { useHistory } from "react-router";
+import { resetSuccess } from "../slices/workoutLogsSlice";
 
 export function NewWorkoutLogPage() {
   const workoutLog = useAppSelector(
@@ -14,9 +15,10 @@ export function NewWorkoutLogPage() {
   const dispatch = useAppDispatch();
   const history = useHistory();
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (workoutLog) {
-      dispatch(postWorkoutLog(workoutLog));
+      await dispatch(postWorkoutLog(workoutLog));
+      dispatch(resetSuccess(4));
       history.push("/logs");
     }
   }
