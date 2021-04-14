@@ -5,16 +5,19 @@ import { WorkoutLogForm } from "../components/WorkoutLogForm";
 import { WorkoutLogTable } from "../containers/WorkoutLogTable";
 import { useAppDispatch, useAppSelector } from "..";
 import { postWorkoutLog } from "../slices/workoutLogsSlice";
+import { useHistory } from "react-router";
 
 export function NewWorkoutLogPage() {
   const workoutLog = useAppSelector(
     (state) => state.workoutLogs.editWorkoutLog
   );
   const dispatch = useAppDispatch();
+  const history = useHistory();
 
   function handleSubmit() {
     if (workoutLog) {
       dispatch(postWorkoutLog(workoutLog));
+      history.push("/logs");
     }
   }
   return (
