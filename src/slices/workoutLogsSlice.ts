@@ -92,13 +92,37 @@ export const getWorkoutLog = createAsyncThunk(
   }
 );
 
+export const deleteWorkoutLog = createAsyncThunk(
+  "workoutLogs/deleteWorkoutLog",
+  async (id: string) => {
+    try {
+      const response: AxiosResponse<string> = await API.delete(
+        `${workoutLogUrl}/${id}`
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
+
+export const resetSuccess = createAsyncThunk(
+  "workoutLogs/resetSuccess",
+  async (seconds: number, { dispatch }) => {
+    setTimeout(() => {
+      dispatch(setSuccess(undefined));
+    }, seconds * 1000);
+  }
+);
+
 const initialState: workoutLogState = {
   data: [],
   editWorkoutLog: { exercises: [], createdAt: undefined },
 };
 
 const slice = createSlice({
-  name: "workoutLogsSlice",
+  name: "workoutLogs",
   initialState,
   reducers: {
     addSet(state, action: PayloadAction<EntryData>) {
@@ -121,6 +145,9 @@ const slice = createSlice({
           sets: [{ weight, unit, repetitions, restInterval }],
         });
       }
+    },
+    setSuccess(state, action: PayloadAction<string | undefined>) {
+      state.success = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -150,8 +177,23 @@ const slice = createSlice({
     builder.addCase(getWorkoutLog.rejected, (state, action) => {
       console.error(action.error.message);
     });
+    builder.addCase(
+      deleteWorkoutLog.fulfilled,
+      (state, action: PayloadAction<string>) => {
+        const deletedWorkoutLogId: string = action.payload;
+        state.data = state.data.filter(
+          (workoutLogHeader) => workoutLogHeader._id !== deletedWorkoutLogId
+        );
+        state.success = `Successfully deleted log`;
+      }
+    );
+    builder.addCase(deleteWorkoutLog.rejected, (state, action) => {
+      console.error(action.error.message);
+      state.error = "Deleting workout failed";
+      state.success = undefined;
+    });
   },
 });
 
 export const workoutLogsReducer = slice.reducer;
-export const { addSet } = slice.actions;
+export const { addSet, setSuccess } = slice.actions;
