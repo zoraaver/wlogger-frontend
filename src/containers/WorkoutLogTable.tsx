@@ -33,7 +33,7 @@ export function WorkoutLogTable() {
       <thead>
         <tr>
           <th>Exercise</th>
-          <th>Repetitions</th>
+          <th>Reps</th>
           <th>Weight</th>
           <th>Rest Interval (mm:ss)</th>
         </tr>
