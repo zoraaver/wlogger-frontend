@@ -8,9 +8,8 @@ import {
   resetSuccess,
   workoutPlanHeaderData,
 } from "../slices/workoutPlansSlice";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
+import { DeleteModal } from "../components/DeleteModal";
 
 export function WorkoutPlansPage() {
   const dispatch = useAppDispatch();
@@ -54,25 +53,13 @@ export function WorkoutPlansPage() {
           handleShow={handleShow}
         />
       ))}
-      <Modal show={show} onHide={() => setShow(false)}>
-        <Modal.Header closeButton>
-          Are you sure you want to delete{" "}
-          <strong className="ml-1">{planToDelete.name}</strong>?
-        </Modal.Header>
-        <Modal.Body>This action is irreversible.</Modal.Body>
-        <Modal.Footer className="py-1">
-          <Button
-            variant="primary"
-            className="py-1"
-            onClick={() => setShow(false)}
-          >
-            Close
-          </Button>
-          <Button variant="danger" className="py-1" onClick={handleDeleteClick}>
-            Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <DeleteModal
+        onHide={() => setShow(false)}
+        show={show}
+        title={planToDelete.name}
+        handleDeleteClick={handleDeleteClick}
+        handleCloseClick={() => setShow(false)}
+      />
     </Container>
   );
 }
