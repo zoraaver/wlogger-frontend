@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button";
 interface DeleteModalProps {
   onHide: () => void;
   show: boolean;
-  title: string;
+  title: JSX.Element;
   handleDeleteClick: () => void;
   handleCloseClick: () => void;
 }
@@ -18,10 +18,7 @@ export function DeleteModal({
 }: DeleteModalProps) {
   return (
     <Modal show={show} onHide={onHide}>
-      <Modal.Header closeButton>
-        Are you sure you want to delete{" "}
-        <strong className="ml-1">{title}</strong>?
-      </Modal.Header>
+      <Modal.Header closeButton>{title}</Modal.Header>
       <Modal.Body>This action is irreversible.</Modal.Body>
       <Modal.Footer className="py-1">
         <Button variant="primary" className="py-1" onClick={handleCloseClick}>
