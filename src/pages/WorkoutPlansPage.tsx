@@ -31,6 +31,13 @@ export function WorkoutPlansPage() {
     (state) => state.workoutPlans
   );
 
+  const modalTitle: JSX.Element = (
+    <>
+      Are you sure you want to delete{" "}
+      <strong className="ml-1">{planToDelete.name}</strong>?
+    </>
+  );
+
   React.useEffect(() => {
     dispatch(getWorkoutPlans());
   }, []);
@@ -56,7 +63,7 @@ export function WorkoutPlansPage() {
       <DeleteModal
         onHide={() => setShow(false)}
         show={show}
-        title={planToDelete.name}
+        title={modalTitle}
         handleDeleteClick={handleDeleteClick}
         handleCloseClick={() => setShow(false)}
       />
