@@ -10,6 +10,7 @@ import { EditWeekPage } from "../pages/EditWeekPage";
 import { WorkoutPlansPage } from "../pages/WorkoutPlansPage";
 import { NewWorkoutLogPage } from "../pages/NewWorkoutLogPage";
 import { WorkoutLogsPage } from "../pages/WorkoutLogsPage";
+import { WorkoutLogPage } from "../pages/WorkoutLogPage";
 
 export function AuthenticatedApp() {
   return (
@@ -40,6 +41,9 @@ export function AuthenticatedApp() {
         </Route>
         <Route exact path="/logs/new">
           <NewWorkoutLogPage />
+        </Route>
+        <Route exact path="/logs/:id">
+          <WorkoutLogPage />
         </Route>
         <Route exact path="/logs">
           <WorkoutLogsPage />
