@@ -5,7 +5,7 @@ import { weightUnit } from "./workoutPlansSlice";
 
 const workoutLogUrl = "/workoutLogs";
 
-interface workoutLogData {
+export interface workoutLogData {
   exercises: Array<exerciseLogData>;
   createdAt?: string;
   updatedAt?: string;
@@ -13,11 +13,13 @@ interface workoutLogData {
 }
 
 interface workoutLogState {
+  success?: string;
+  error?: string;
   data: Array<workoutLogHeaderData>;
   editWorkoutLog?: workoutLogData;
 }
 
-interface workoutLogHeaderData {
+export interface workoutLogHeaderData {
   createdAt: string;
   setCount: number;
   exerciseCount: number;
@@ -48,7 +50,10 @@ export const postWorkoutLog = createAsyncThunk(
   "workoutLogs/postWorkoutLog",
   async (data: workoutLogData) => {
     try {
-      const response: AxiosResponse<any> = await API.post(workoutLogUrl, data);
+      const response: AxiosResponse<workoutLogData> = await API.post(
+        workoutLogUrl,
+        data
+      );
       return response.data;
     } catch (error) {
       if (error.response) return Promise.reject(error.response.data);
@@ -63,6 +68,21 @@ export const getWorkoutLogs = createAsyncThunk(
     try {
       const response: AxiosResponse<workoutLogHeaderData[]> = await API.get(
         workoutLogUrl
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
+
+export const getWorkoutLog = createAsyncThunk(
+  "workoutLogs/getWorkoutLog",
+  async (id: string) => {
+    try {
+      const response: AxiosResponse<workoutLogData> = await API.get(
+        `${workoutLogUrl}/${id}`
       );
       return response.data;
     } catch (error) {
@@ -106,11 +126,13 @@ const slice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(
       postWorkoutLog.fulfilled,
-      (state, action: PayloadAction<any>) => {
-        console.log(action.payload);
+      (state, action: PayloadAction<workoutLogData>) => {
+        const dateLogged: Date = new Date(action.payload.createdAt as string);
+        state.success = `Successfully logged workout on ${dateLogged.toLocaleString()}`;
       }
     );
     builder.addCase(postWorkoutLog.rejected, (state, action) => {
+      state.editWorkoutLog = undefined;
       console.error(action.error.message);
     });
     builder.addCase(
@@ -119,6 +141,15 @@ const slice = createSlice({
         state.data = action.payload;
       }
     );
+    builder.addCase(
+      getWorkoutLog.fulfilled,
+      (state, action: PayloadAction<workoutLogData>) => {
+        state.editWorkoutLog = action.payload;
+      }
+    );
+    builder.addCase(getWorkoutLog.rejected, (state, action) => {
+      console.error(action.error.message);
+    });
   },
 });
 
