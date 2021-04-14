@@ -20,14 +20,22 @@ export function WorkoutLogForm() {
     timeElapsedSinceEntryAdded,
     setTimeElapsedSinceEntryAdded,
   ] = React.useState(0);
+  const [setInProgress, setSetInProgress] = React.useState(false);
+  const dispatch = useAppDispatch();
 
   React.useEffect(() => {
-    setTimeout(() => {
-      setTimeElapsedSinceEntryAdded(Date.now() - formData.restInterval);
-    }, 1000);
-  }, [timeElapsedSinceEntryAdded]);
-
-  const dispatch = useAppDispatch();
+    let timer: NodeJS.Timeout;
+    if (!setInProgress) {
+      timer = setTimeout(() => {
+        setTimeElapsedSinceEntryAdded(Date.now() - formData.restInterval);
+      }, 1000);
+    } else {
+      setTimeElapsedSinceEntryAdded(formData.restInterval * 1000);
+    }
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [timeElapsedSinceEntryAdded, setInProgress]);
 
   function handleChange({ target }: React.ChangeEvent<HTMLInputElement>) {
     const numberValue = Number(target.value);
@@ -68,11 +76,17 @@ export function WorkoutLogForm() {
     if (formData.repetitions === ("" as any)) formData.repetitions = 0;
     if (formData.weight === ("" as any)) formData.weight = 0;
 
-    formData.restInterval = (Date.now() - formData.restInterval) / 1000;
-    setError("");
-    dispatch(addSet(formData));
-    // reset time for new set
-    formData.restInterval = Date.now();
+    if (setInProgress) {
+      setSetInProgress(false);
+      setError("");
+      dispatch(addSet(formData));
+      // reset time for new set
+      formData.restInterval = Date.now();
+    } else {
+      setSetInProgress(true);
+      // record time between beginning of last set and start of current set
+      formData.restInterval = (Date.now() - formData.restInterval) / 1000;
+    }
   }
 
   return (
@@ -131,8 +145,8 @@ export function WorkoutLogForm() {
           className="d-flex flex-column justify-content-end align-items-center"
           lg={50}
         >
-          <Button variant="primary" type="submit">
-            + entry
+          <Button variant={setInProgress ? "danger" : "success"} type="submit">
+            {setInProgress ? "End set" : "Begin set"}
           </Button>
         </Col>
       </Form.Row>
