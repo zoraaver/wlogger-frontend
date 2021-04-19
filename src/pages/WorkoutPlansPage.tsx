@@ -57,10 +57,7 @@ export function WorkoutPlansPage() {
       {workoutPlans.map((workoutPlan: workoutPlanHeaderData) => (
         <WorkoutPlanCard
           key={workoutPlan._id}
-          name={workoutPlan.name}
-          length={workoutPlan.length}
-          status={workoutPlan.status}
-          _id={workoutPlan._id}
+          workoutPlan={workoutPlan}
           handleShow={handleShow}
         />
       ))}
