@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosResponse } from "axios";
 import { API } from "../config/axios.config";
+import { calculateLength } from "../util/util";
 
 const workoutPlansUrl = "/workoutPlans";
 export type workoutPlanStatus = "In progress" | "Completed" | "Not started";
@@ -8,7 +9,7 @@ export type workoutPlanStatus = "In progress" | "Completed" | "Not started";
 export interface workoutPlanData {
   _id?: string;
   name: string;
-  length: number;
+  length?: number;
   status: workoutPlanStatus;
   weeks: Array<weekData>;
 }
@@ -48,6 +49,9 @@ export interface workoutPlanHeaderData {
   name: string;
   length: number;
   status: workoutPlanStatus;
+  start?: string;
+  end?: string;
+  weeks: Array<weekData>;
   _id: string;
 }
 
@@ -149,9 +153,10 @@ export const patchStartWorkoutPlan = createAsyncThunk(
   "workoutPlans/patchStartWorkoutPlan",
   async (_id: string) => {
     try {
-      const response: AxiosResponse<string> = await API.patch(
-        `${workoutPlansUrl}/start/${_id}`
-      );
+      const response: AxiosResponse<{
+        id: string;
+        start: string;
+      }> = await API.patch(`${workoutPlansUrl}/start/${_id}`);
       return response.data;
     } catch (error) {
       if (error.response) return Promise.reject(error.response.data);
@@ -190,9 +195,12 @@ const slice = createSlice({
   reducers: {
     setInitialWorkoutPlanData(state, action: PayloadAction<workoutPlanData>) {
       state.editWorkoutPlan = action.payload;
+      state.editWorkoutPlan.length = 0;
     },
     addWeek(state, action: PayloadAction<weekData>) {
-      state.editWorkoutPlan?.weeks.push(action.payload);
+      if (!state.editWorkoutPlan) return;
+      state.editWorkoutPlan.weeks.push(action.payload);
+      state.editWorkoutPlan.length = calculateLength(state.editWorkoutPlan);
     },
     addWorkout(state, action: PayloadAction<{ position: number; day: Day }>) {
       const { position, day } = action.payload;
@@ -268,7 +276,8 @@ const slice = createSlice({
             --week.position;
           }
         });
-        state.editWorkoutPlan?.weeks.splice(weekToDeleteIndex, 1);
+        state.editWorkoutPlan.weeks.splice(weekToDeleteIndex, 1);
+        state.editWorkoutPlan.length = calculateLength(state.editWorkoutPlan);
       }
     },
     deleteWorkout(
@@ -321,11 +330,15 @@ const slice = createSlice({
     });
     builder.addCase(getWorkoutPlans.fulfilled, (state, action) => {
       state.data = action.payload;
+      state.data.forEach((plan: workoutPlanHeaderData) => {
+        plan.length = calculateLength(plan);
+      });
     });
     builder.addCase(
       getWorkoutPlan.fulfilled,
       (state, action: PayloadAction<workoutPlanData>) => {
         state.editWorkoutPlan = action.payload;
+        state.editWorkoutPlan.length = calculateLength(state.editWorkoutPlan);
         state.error = undefined;
       }
     );
@@ -340,6 +353,7 @@ const slice = createSlice({
       patchWorkoutPlan.fulfilled,
       (state, action: PayloadAction<workoutPlanData>) => {
         state.editWorkoutPlan = action.payload;
+        state.editWorkoutPlan.length = calculateLength(state.editWorkoutPlan);
         state.success = `${action.payload.name} successfully updated`;
         state.error = undefined;
       }
@@ -372,15 +386,18 @@ const slice = createSlice({
     );
     builder.addCase(
       patchStartWorkoutPlan.fulfilled,
-      (state, action: PayloadAction<string>) => {
+      (state, action: PayloadAction<{ id: string; start: string }>) => {
         const previousPlan = state.data.find(
           (plan: workoutPlanHeaderData) => plan.status === "In progress"
         );
         if (previousPlan !== undefined) previousPlan.status = "Not started";
         const currentPlan = state.data.find(
-          (plan: workoutPlanHeaderData) => plan._id === action.payload
+          (plan: workoutPlanHeaderData) => plan._id === action.payload.id
         );
-        if (currentPlan) currentPlan.status = "In progress";
+        if (currentPlan) {
+          currentPlan.status = "In progress";
+          currentPlan.start = action.payload.start;
+        }
       }
     );
     builder.addCase(patchStartWorkoutPlan.rejected, (state, action) => {

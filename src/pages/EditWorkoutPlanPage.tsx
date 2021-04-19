@@ -51,12 +51,6 @@ export function EditWorkoutPlanPage() {
     return <LoadingSpinner />;
   }
 
-  function calculateLength(workoutPlanData: workoutPlanData): number {
-    return workoutPlanData.weeks.reduce((acc: number, curr: weekData) => {
-      return acc + curr.repeat + 1;
-    }, 0);
-  }
-
   function handleAddClick() {
     const currentPosition: number = workoutPlanData.weeks.length + 1;
     dispatch(addWeek({ position: currentPosition, repeat: 0, workouts: [] }));
@@ -74,20 +68,6 @@ export function EditWorkoutPlanPage() {
     }
   }
 
-  function renderAddWeek(): JSX.Element {
-    if (
-      calculateLength(workoutPlanData) >= workoutPlanData.length &&
-      workoutPlanData.length
-    ) {
-      return <></>;
-    }
-    return (
-      <Button onClick={handleAddClick} variant="success" className="mt-2">
-        + week
-      </Button>
-    );
-  }
-
   const { name, length } = workoutPlanData;
   return (
     <Container className="mt-5 d-flex flex-column justify-content-center align-items-center">
@@ -95,7 +75,7 @@ export function EditWorkoutPlanPage() {
         <Card.Body>
           <Card.Title>{name}</Card.Title>
           <Card.Text>
-            <strong>Length:</strong> {length ? length + " weeks" : "indefinite"}
+            <strong>Length:</strong> {length} weeks
             <Button
               variant="primary"
               className="d-inline-block mx-4 mb-1 py-1"
@@ -109,7 +89,9 @@ export function EditWorkoutPlanPage() {
           </Alert>
         </Card.Body>
       </Card>
-      {renderAddWeek()}
+      <Button onClick={handleAddClick} variant="success" className="mt-2">
+        + week
+      </Button>
       {workoutPlanData.weeks.map((week: weekData) => (
         <Week weekData={week} key={week.position} />
       ))}

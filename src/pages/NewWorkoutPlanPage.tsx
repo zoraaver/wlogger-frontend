@@ -18,9 +18,7 @@ export function NewWorkoutPlanPage() {
             Create a new workout plan. You don't need to create a plan to start
             logging workouts. However, creating a plan allows you to template
             workouts and save you manually adding exercises/sets/weight every
-            time you want to log a new workout. If you want the workout plan to
-            run indefinitely, don't enter a length - in this case, the plan will
-            restart once it has ended.
+            time you want to log a new workout.
           </Card.Text>
         </Card.Body>
       </Card>

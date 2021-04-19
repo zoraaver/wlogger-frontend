@@ -25,18 +25,13 @@ export function WorkoutPlanForm() {
 
   const [formData, setFormData] = React.useState<workoutPlanData>({
     name: "",
-    length: 0,
     status: "Not started",
     weeks: [],
   });
   const [error, setError] = React.useState("");
 
   function handleChange({ target }: React.ChangeEvent<HTMLInputElement>) {
-    if (target.name === "length") {
-      setFormData({ ...formData, length: Number(target.value) });
-    } else {
-      setFormData({ ...formData, [target.name]: target.value });
-    }
+    setFormData({ ...formData, [target.name]: target.value });
   }
 
   return (
@@ -56,16 +51,6 @@ export function WorkoutPlanForm() {
               placeholder="name"
             />
             {error ? <div className="text-danger">{error}</div> : null}
-          </Form.Group>
-          <Form.Group controlId="formBasicLength">
-            <Form.Label>Length (in weeks)</Form.Label>
-            <Form.Control
-              name="length"
-              onChange={handleChange}
-              value={formData.length ? formData.length : ""}
-              type="length"
-              placeholder="length"
-            />
           </Form.Group>
           <Button className="py-1 mt-2" variant="success" type="submit">
             Next
