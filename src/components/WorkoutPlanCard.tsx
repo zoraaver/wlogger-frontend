@@ -2,7 +2,12 @@ import * as React from "react";
 import { Pencil, Trash } from "react-bootstrap-icons";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
-import { workoutPlanHeaderData } from "../slices/workoutPlansSlice";
+import {
+  patchStartWorkoutPlan,
+  resetError,
+  workoutPlanHeaderData,
+} from "../slices/workoutPlansSlice";
+import { useAppDispatch } from "..";
 
 type WorkoutPlanCardProps = workoutPlanHeaderData & {
   handleShow: (_id: string, name: string) => void;
@@ -11,9 +16,17 @@ type WorkoutPlanCardProps = workoutPlanHeaderData & {
 export function WorkoutPlanCard({
   name,
   length,
+  status,
   _id,
   handleShow,
 }: WorkoutPlanCardProps) {
+  const dispatch = useAppDispatch();
+
+  async function handleStartClick() {
+    await dispatch(patchStartWorkoutPlan(_id));
+    dispatch(resetError(4));
+  }
+
   return (
     <Card className="w-50 mt-4">
       <Card.Header className="d-flex flex-row justify-content-end align-items-center">
@@ -35,7 +48,16 @@ export function WorkoutPlanCard({
       </Card.Header>
       <Card.Body>
         <strong>Length:</strong> {length === 0 ? "Indefinite" : length} weeks
+        <br></br>
+        <strong>Status:</strong> {status}
       </Card.Body>
+      {status !== "In progress" ? (
+        <Card.Footer>
+          <Button className="py-1" onClick={handleStartClick}>
+            Start
+          </Button>
+        </Card.Footer>
+      ) : null}
     </Card>
   );
 }
