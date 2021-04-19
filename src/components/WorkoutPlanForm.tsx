@@ -26,7 +26,7 @@ export function WorkoutPlanForm() {
   const [formData, setFormData] = React.useState<workoutPlanData>({
     name: "",
     length: 0,
-    current: false,
+    status: "Not started",
     weeks: [],
   });
   const [error, setError] = React.useState("");
@@ -34,8 +34,6 @@ export function WorkoutPlanForm() {
   function handleChange({ target }: React.ChangeEvent<HTMLInputElement>) {
     if (target.name === "length") {
       setFormData({ ...formData, length: Number(target.value) });
-    } else if (target.name === "current") {
-      setFormData({ ...formData, current: !formData.current });
     } else {
       setFormData({ ...formData, [target.name]: target.value });
     }
@@ -69,13 +67,6 @@ export function WorkoutPlanForm() {
               placeholder="length"
             />
           </Form.Group>
-          <Form.Check
-            type="checkbox"
-            name="current"
-            label="Make this plan my current plan"
-            value={Number(formData.current)}
-            onChange={handleChange}
-          />
           <Button className="py-1 mt-2" variant="success" type="submit">
             Next
           </Button>
