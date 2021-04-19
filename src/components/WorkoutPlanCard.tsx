@@ -9,22 +9,41 @@ import {
 } from "../slices/workoutPlansSlice";
 import { useAppDispatch } from "..";
 
-type WorkoutPlanCardProps = workoutPlanHeaderData & {
+interface WorkoutPlanCardProps {
+  workoutPlan: workoutPlanHeaderData;
   handleShow: (_id: string, name: string) => void;
-};
+}
 
 export function WorkoutPlanCard({
-  name,
-  length,
-  status,
-  _id,
+  workoutPlan,
   handleShow,
 }: WorkoutPlanCardProps) {
   const dispatch = useAppDispatch();
+  const { name, length, status, _id, start, end } = workoutPlan;
 
   async function handleStartClick() {
     await dispatch(patchStartWorkoutPlan(_id));
     dispatch(resetError(4));
+  }
+
+  function renderFooter(): JSX.Element | null {
+    switch (status) {
+      case "Not started":
+        return (
+          <Button className="py-1" onClick={handleStartClick}>
+            Start
+          </Button>
+        );
+      case "In progress":
+        return start ? <>Start date: {new Date(start).toDateString()}</> : null;
+      case "Completed":
+        return start && end ? (
+          <>
+            Start date: {new Date(start).toDateString()}
+            <br></br>End date: {new Date(end).toDateString()}
+          </>
+        ) : null;
+    }
   }
 
   return (
@@ -51,13 +70,7 @@ export function WorkoutPlanCard({
         <br></br>
         <strong>Status:</strong> {status}
       </Card.Body>
-      {status !== "In progress" ? (
-        <Card.Footer>
-          <Button className="py-1" onClick={handleStartClick}>
-            Start
-          </Button>
-        </Card.Footer>
-      ) : null}
+      <Card.Footer>{renderFooter()}</Card.Footer>
     </Card>
   );
 }
