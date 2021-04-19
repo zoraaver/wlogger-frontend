@@ -3,12 +3,13 @@ import { AxiosResponse } from "axios";
 import { API } from "../config/axios.config";
 
 const workoutPlansUrl = "/workoutPlans";
+export type workoutPlanStatus = "In progress" | "Completed" | "Not started";
 
 export interface workoutPlanData {
   _id?: string;
   name: string;
   length: number;
-  current: boolean;
+  status: workoutPlanStatus;
   weeks: Array<weekData>;
 }
 
@@ -46,6 +47,7 @@ export type Day =
 export interface workoutPlanHeaderData {
   name: string;
   length: number;
+  status: workoutPlanStatus;
   _id: string;
 }
 
@@ -143,11 +145,34 @@ export const deleteWorkoutPlan = createAsyncThunk(
   }
 );
 
+export const patchStartWorkoutPlan = createAsyncThunk(
+  "workoutPlans/patchStartWorkoutPlan",
+  async (_id: string) => {
+    try {
+      const response: AxiosResponse<string> = await API.patch(
+        `${workoutPlansUrl}/start/${_id}`
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
+
 export const resetSuccess = createAsyncThunk(
   "workoutPlans/resetSuccess",
   async (seconds: number, { dispatch }) => {
     setTimeout(() => {
       dispatch(setSuccess(undefined));
+    }, 1000 * seconds);
+  }
+);
+export const resetError = createAsyncThunk(
+  "workoutPlans/resetError",
+  async (seconds: number, { dispatch }) => {
+    setTimeout(() => {
+      dispatch(setError(undefined));
     }, 1000 * seconds);
   }
 );
@@ -279,6 +304,9 @@ const slice = createSlice({
     setSuccess(state, action: PayloadAction<string | undefined>) {
       state.success = action.payload;
     },
+    setError(state, action: PayloadAction<string | undefined>) {
+      state.error = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(
@@ -342,6 +370,23 @@ const slice = createSlice({
         state.error = (action.payload as { message: string }).message;
       }
     );
+    builder.addCase(
+      patchStartWorkoutPlan.fulfilled,
+      (state, action: PayloadAction<string>) => {
+        const previousPlan = state.data.find(
+          (plan: workoutPlanHeaderData) => plan.status === "In progress"
+        );
+        if (previousPlan !== undefined) previousPlan.status = "Not started";
+        const currentPlan = state.data.find(
+          (plan: workoutPlanHeaderData) => plan._id === action.payload
+        );
+        if (currentPlan) currentPlan.status = "In progress";
+      }
+    );
+    builder.addCase(patchStartWorkoutPlan.rejected, (state, action) => {
+      state.success = undefined;
+      state.error = action.error.message;
+    });
   },
 });
 
@@ -356,4 +401,5 @@ export const {
   deleteWorkout,
   deleteEmptyWorkouts,
   setSuccess,
+  setError,
 } = slice.actions;
