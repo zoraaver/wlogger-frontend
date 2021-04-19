@@ -27,7 +27,7 @@ export function WorkoutPlansPage() {
     setShow(false);
   }
 
-  const { data: workoutPlans, success: successMessage } = useAppSelector(
+  const { data: workoutPlans, success: successMessage, error } = useAppSelector(
     (state) => state.workoutPlans
   );
 
@@ -51,11 +51,15 @@ export function WorkoutPlansPage() {
       <Alert variant="success" show={!!successMessage}>
         {successMessage}
       </Alert>
+      <Alert variant="danger" show={!!error}>
+        {error}
+      </Alert>
       {workoutPlans.map((workoutPlan: workoutPlanHeaderData) => (
         <WorkoutPlanCard
           key={workoutPlan._id}
           name={workoutPlan.name}
           length={workoutPlan.length}
+          status={workoutPlan.status}
           _id={workoutPlan._id}
           handleShow={handleShow}
         />
