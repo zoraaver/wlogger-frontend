@@ -8,7 +8,7 @@ export function NewWorkoutPlanPage() {
   return (
     <Container
       fluid
-      className="mt-5 justify-content-center align-items-center d-flex flex-column mb-3"
+      className="mt-5 justify-content-center align-items-center d-flex flex-column mb-3 ml-5"
     >
       <Card className="w-50 bg-light mt-3">
         <Card.Body>
