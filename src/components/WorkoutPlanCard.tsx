@@ -8,18 +8,25 @@ import {
   workoutPlanHeaderData,
 } from "../slices/workoutPlansSlice";
 import { useAppDispatch } from "..";
+import { useHistory } from "react-router";
 
 interface WorkoutPlanCardProps {
   workoutPlan: workoutPlanHeaderData;
-  handleShow: (_id: string, name: string) => void;
+  showDelete?: boolean;
+  handleShow?: (_id: string, name: string) => void;
+  width?: number;
 }
 
 export function WorkoutPlanCard({
   workoutPlan,
   handleShow,
+  showDelete,
+  width = 50,
 }: WorkoutPlanCardProps) {
   const dispatch = useAppDispatch();
+  const history = useHistory();
   const { name, length, status, _id, start, end } = workoutPlan;
+  const widthString: string = `w-${width}`;
 
   async function handleStartClick() {
     await dispatch(patchStartWorkoutPlan(_id));
@@ -47,23 +54,25 @@ export function WorkoutPlanCard({
   }
 
   return (
-    <Card className="w-50 mt-4">
+    <Card className={widthString + " mt-4"}>
       <Card.Header className="d-flex flex-row justify-content-end align-items-center">
         <Card.Title className="mb-0 mr-auto">{name}</Card.Title>
         <Button
+          onClick={() => history.push(`/plans/${_id}/weeks`)}
           variant="link"
-          href={`/plans/${_id}/weeks`}
           className="mb-0 d-inline-block"
         >
           <Pencil />
         </Button>
-        <Button
-          onClick={() => handleShow(_id, name)}
-          variant="danger"
-          className="ml-2 mb-0 d-inline-block py-1 px-1"
-        >
-          <Trash />
-        </Button>
+        {showDelete && handleShow ? (
+          <Button
+            onClick={() => handleShow(_id, name)}
+            variant="danger"
+            className="ml-2 mb-0 d-inline-block py-1 px-1"
+          >
+            <Trash />
+          </Button>
+        ) : null}
       </Card.Header>
       <Card.Body>
         <strong>Length:</strong> {length === 0 ? "Indefinite" : length} weeks
