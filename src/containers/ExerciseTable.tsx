@@ -1,15 +1,20 @@
 import * as React from "react";
-import { exerciseData, workoutData } from "../slices/workoutPlansSlice";
+import { exerciseData, workoutData } from "../slices/workoutsSlice";
 import Table from "react-bootstrap/Table";
 import { ExerciseRow } from "../components/ExerciseRow";
 
 interface ExerciseTableProps {
   workout: workoutData;
-  weekPosition: number;
+  width?: number;
+  weekPosition?: number;
 }
-export function ExerciseTable({ workout, weekPosition }: ExerciseTableProps) {
+export function ExerciseTable({
+  workout,
+  weekPosition,
+  width,
+}: ExerciseTableProps) {
   return (
-    <Table striped bordered>
+    <Table className={width ? "w-" + width : ""} striped bordered>
       <thead>
         <tr>
           <th>Exercise name</th>
