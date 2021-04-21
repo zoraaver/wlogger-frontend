@@ -24,6 +24,7 @@ export function NewWorkoutLogPage() {
   }
   return (
     <Container className="mt-5 d-flex flex-column justify-content-start align-items-center">
+      <h4 className="mt-3">New Log</h4>
       <WorkoutLogForm />
       <WorkoutLogTable />
       <Button variant="success" onClick={handleSubmit}>
