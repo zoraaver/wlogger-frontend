@@ -68,6 +68,19 @@ export function EditWorkoutPlanPage() {
     }
   }
 
+  function renderStartDate() {
+    if (workoutPlanData.status === "In progress") {
+      const startDate = new Date(workoutPlanData.start as string);
+      return (
+        <>
+          <strong>Start date:</strong> {startDate.toLocaleDateString()}
+          <br></br>
+        </>
+      );
+    }
+    return undefined;
+  }
+
   const { name, length } = workoutPlanData;
   return (
     <Container className="mt-5 d-flex flex-column justify-content-center align-items-center">
@@ -75,10 +88,11 @@ export function EditWorkoutPlanPage() {
         <Card.Body>
           <Card.Title>{name}</Card.Title>
           <Card.Text>
-            <strong>Length:</strong> {length} weeks
+            <strong>Length:</strong> {length} weeks<br></br>
+            {renderStartDate()}
             <Button
               variant="primary"
-              className="d-inline-block mx-4 mb-1 py-1"
+              className="d-inline-block my-2 py-1"
               onClick={handleSaveClick}
             >
               {workoutPlanData._id ? "Save" : "Create"}
