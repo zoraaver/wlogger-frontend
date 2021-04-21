@@ -2,13 +2,9 @@ import * as React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
-import {
-  addExercise,
-  Day,
-  exerciseData,
-  weightUnit,
-} from "../slices/workoutPlansSlice";
+import { addExercise, Day, weightUnit } from "../slices/workoutPlansSlice";
 import { useAppDispatch } from "..";
+import { exerciseData } from "../slices/workoutsSlice";
 
 interface ExerciseFormProps {
   dayOfWeek: Day;

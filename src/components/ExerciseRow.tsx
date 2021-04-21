@@ -1,8 +1,9 @@
 import * as React from "react";
 import Button from "react-bootstrap/Button";
-import { Day, deleteExercise, exerciseData } from "../slices/workoutPlansSlice";
+import { Day, deleteExercise } from "../slices/workoutPlansSlice";
 import { Trash } from "react-bootstrap-icons";
 import { useAppDispatch } from "..";
+import { exerciseData } from "../slices/workoutsSlice";
 
 interface ExerciseRowProps {
   exerciseData: exerciseData;
