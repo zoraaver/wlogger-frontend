@@ -26,3 +26,21 @@ export function calculateLength(
     0
   );
 }
+
+export function isToday(date: Date): boolean {
+  const today: Date = new Date(Date.now());
+  return (
+    date.getFullYear() === today.getFullYear() &&
+    date.getMonth() === today.getMonth() &&
+    date.getDate() === today.getDate()
+  );
+}
+
+export function isTomorrow(date: Date): boolean {
+  const today: Date = new Date(Date.now());
+  return (
+    date.getFullYear() === today.getFullYear() &&
+    date.getMonth() === today.getMonth() &&
+    date.getDate() === today.getDate() + 1
+  );
+}
