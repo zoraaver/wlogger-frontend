@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom";
 import { App } from "./components/App";
 import { BrowserRouter as Router } from "react-router-dom";
 import { workoutPlansReducer } from "./slices/workoutPlansSlice";
+import { workoutsReducer } from "./slices/workoutsSlice";
 import { workoutLogsReducer } from "./slices/workoutLogsSlice";
 import { userReducer } from "./slices/usersSlice";
 import {
@@ -13,12 +14,15 @@ import {
 } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { UIReducer } from "./slices/UISlice";
 
 const store = configureStore({
   reducer: {
     user: userReducer,
     workoutPlans: workoutPlansReducer,
     workoutLogs: workoutLogsReducer,
+    workouts: workoutsReducer,
+    UI: UIReducer,
   },
 });
 
