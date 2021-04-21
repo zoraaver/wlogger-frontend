@@ -1,5 +1,5 @@
 import * as React from "react";
-import { exerciseData, workoutData } from "../slices/workoutPlansSlice";
+import { exerciseData, workoutData } from "../slices/workoutsSlice";
 import Table from "react-bootstrap/Table";
 import { ExerciseRow } from "../components/ExerciseRow";
 

@@ -5,8 +5,9 @@ import Button from "react-bootstrap/Button";
 import { ExerciseTable } from "../containers/ExerciseTable";
 import { Trash } from "react-bootstrap-icons";
 import { ExerciseForm } from "../components/ExerciseForm";
-import { deleteWorkout, workoutData } from "../slices/workoutPlansSlice";
+import { deleteWorkout } from "../slices/workoutPlansSlice";
 import { useAppDispatch } from "..";
+import { workoutData } from "../slices/workoutsSlice";
 
 interface WorkoutCardProps {
   position: number;

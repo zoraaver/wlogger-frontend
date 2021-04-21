@@ -13,12 +13,12 @@ import {
   deleteEmptyWorkouts,
   getWorkoutPlan,
   weekData,
-  workoutData,
 } from "../slices/workoutPlansSlice";
 import { ArrowLeft } from "react-bootstrap-icons";
 import { WorkoutCard } from "../containers/WorkoutCard";
 import { SomethingWentWrongAlert } from "../components/SomethingWentWrongAlert";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import { workoutData } from "../slices/workoutsSlice";
 
 export function EditWeekPage() {
   const params = useParams<{
