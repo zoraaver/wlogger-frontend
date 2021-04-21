@@ -2,11 +2,13 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosResponse } from "axios";
 import { API } from "../config/axios.config";
 import { calculateLength } from "../util/util";
+import { exerciseData, workoutData } from "./workoutsSlice";
 
-const workoutPlansUrl = "/workoutPlans";
+export const workoutPlansUrl = "/workoutPlans";
 export type workoutPlanStatus = "In progress" | "Completed" | "Not started";
 
 export interface workoutPlanData {
+  start?: string;
   _id?: string;
   name: string;
   length?: number;
@@ -18,20 +20,6 @@ export interface weekData {
   position: number;
   workouts: Array<workoutData>;
   repeat: number;
-}
-
-export interface exerciseData {
-  name: string;
-  restInterval?: number;
-  sets: number;
-  repetitions?: number;
-  weight?: number;
-  unit: weightUnit;
-}
-
-export interface workoutData {
-  dayOfWeek: Day;
-  exercises: Array<exerciseData>;
 }
 
 export type weightUnit = "kg" | "lb";
@@ -69,6 +57,7 @@ interface workoutPlanState {
   data: Array<workoutPlanHeaderData>;
   error: string | undefined;
   editWorkoutPlan: workoutPlanData | undefined;
+  currentPlan?: workoutPlanData;
   success: string | undefined;
 }
 
@@ -157,6 +146,21 @@ export const patchStartWorkoutPlan = createAsyncThunk(
         id: string;
         start: string;
       }> = await API.patch(`${workoutPlansUrl}/start/${_id}`);
+      return response.data;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
+
+export const getCurrentPlan = createAsyncThunk(
+  "workoutPlans/getCurrentPlan",
+  async () => {
+    try {
+      const response: AxiosResponse<workoutPlanData> = await API.get(
+        `${workoutPlansUrl}/current`
+      );
       return response.data;
     } catch (error) {
       if (error.response) return Promise.reject(error.response.data);
@@ -403,6 +407,14 @@ const slice = createSlice({
     builder.addCase(patchStartWorkoutPlan.rejected, (state, action) => {
       state.success = undefined;
       state.error = action.error.message;
+    });
+    builder.addCase(getCurrentPlan.fulfilled, (state, action) => {
+      state.error = undefined;
+      state.currentPlan = action.payload;
+      state.currentPlan.length = calculateLength(state.currentPlan);
+    });
+    builder.addCase(getCurrentPlan.rejected, (state, action) => {
+      state.currentPlan = undefined;
     });
   },
 });
