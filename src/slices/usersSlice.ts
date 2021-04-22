@@ -106,12 +106,14 @@ interface signupError {
   error: string;
 }
 
+type authenticationStatus = "pending" | "confirmed" | "unknown";
+
 interface userState {
   loginError: string | undefined;
   signupError: signupError | undefined;
   signupSuccess: string | undefined;
   verificationError: string | undefined;
-  authenticationStatus: "pending" | "confirmed" | "unknown";
+  authenticationStatus: authenticationStatus;
   data: userData | null;
 }
 
@@ -131,6 +133,12 @@ const slice = createSlice({
     logoutUser(state, action: PayloadAction<void>) {
       state.data = null;
       state.authenticationStatus = "unknown";
+    },
+    setAuthenticationStatus(
+      state,
+      action: PayloadAction<authenticationStatus>
+    ) {
+      state.authenticationStatus = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -217,5 +225,5 @@ const slice = createSlice({
   },
 });
 
-export const { logoutUser } = slice.actions;
+export const { logoutUser, setAuthenticationStatus } = slice.actions;
 export const userReducer = slice.reducer;
