@@ -57,7 +57,7 @@ interface workoutPlanState {
   data: Array<workoutPlanHeaderData>;
   error: string | undefined;
   editWorkoutPlan: workoutPlanData | undefined;
-  currentPlan?: workoutPlanData;
+  currentPlan?: workoutPlanHeaderData;
   success: string | undefined;
 }
 
@@ -158,7 +158,7 @@ export const getCurrentPlan = createAsyncThunk(
   "workoutPlans/getCurrentPlan",
   async () => {
     try {
-      const response: AxiosResponse<workoutPlanData> = await API.get(
+      const response: AxiosResponse<workoutPlanHeaderData> = await API.get(
         `${workoutPlansUrl}/current`
       );
       return response.data;
