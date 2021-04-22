@@ -36,7 +36,8 @@ export function EditWorkoutPlanPage() {
   );
 
   React.useEffect(() => {
-    if (id && !workoutPlanData) {
+    // only fetch data if workout being edited is different or there is no data
+    if (id && (!workoutPlanData || workoutPlanData._id !== id)) {
       dispatch(getWorkoutPlan(id));
     }
   }, [id]);
