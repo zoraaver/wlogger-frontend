@@ -16,7 +16,7 @@ interface workoutLogState {
   success?: string;
   error?: string;
   data: Array<workoutLogHeaderData>;
-  editWorkoutLog?: workoutLogData;
+  editWorkoutLog: workoutLogData;
 }
 
 export interface workoutLogHeaderData {
@@ -127,13 +127,11 @@ const slice = createSlice({
   reducers: {
     addSet(state, action: PayloadAction<EntryData>) {
       const { name, repetitions, weight, unit, restInterval } = action.payload;
-      if (!state.editWorkoutLog) return;
       const exercises = state.editWorkoutLog.exercises;
-      const exerciseAlreadyLogged = exercises.find(
-        (exercise) => exercise.name === name
-      );
-      if (exerciseAlreadyLogged) {
-        exerciseAlreadyLogged.sets.push({
+      const lastLoggedExercise =
+        exercises.length > 0 ? exercises[exercises.length - 1] : undefined;
+      if (lastLoggedExercise && lastLoggedExercise.name === name) {
+        lastLoggedExercise.sets.push({
           weight,
           unit,
           repetitions,
@@ -149,6 +147,9 @@ const slice = createSlice({
     setSuccess(state, action: PayloadAction<string | undefined>) {
       state.success = action.payload;
     },
+    clearEditWorkoutLog(state, action: PayloadAction<void>) {
+      state.editWorkoutLog = { exercises: [], createdAt: undefined };
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(
@@ -159,7 +160,7 @@ const slice = createSlice({
       }
     );
     builder.addCase(postWorkoutLog.rejected, (state, action) => {
-      state.editWorkoutLog = undefined;
+      state.editWorkoutLog = { exercises: [] };
       console.error(action.error.message);
     });
     builder.addCase(
@@ -196,4 +197,4 @@ const slice = createSlice({
 });
 
 export const workoutLogsReducer = slice.reducer;
-export const { addSet, setSuccess } = slice.actions;
+export const { addSet, setSuccess, clearEditWorkoutLog } = slice.actions;
