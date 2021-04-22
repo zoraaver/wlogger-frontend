@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useAppSelector, useAppDispatch } from "..";
-import { validateUser } from "../slices/usersSlice";
+import { validateUser, setAuthenticationStatus } from "../slices/usersSlice";
 import { AuthenticatedApp } from "./AuthenticatedApp";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { UnauthenticatedApp } from "./UnauthenticatedApp";
@@ -12,7 +12,11 @@ export function App() {
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
-    dispatch(validateUser());
+    if (localStorage.token) {
+      dispatch(validateUser());
+    } else {
+      dispatch(setAuthenticationStatus("unknown"));
+    }
   }, []);
 
   switch (authenticationStatus) {
