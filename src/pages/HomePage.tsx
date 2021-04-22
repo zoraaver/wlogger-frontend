@@ -7,10 +7,7 @@ import { ExerciseTable } from "../containers/ExerciseTable";
 import { isToday, isTomorrow } from "../util/util";
 import { Card } from "react-bootstrap";
 import { useHistory } from "react-router";
-import {
-  getCurrentPlan,
-  workoutPlanHeaderData,
-} from "../slices/workoutPlansSlice";
+import { getCurrentPlan } from "../slices/workoutPlansSlice";
 import { WorkoutPlanCard } from "../components/WorkoutPlanCard";
 
 export function HomePage() {
@@ -67,7 +64,14 @@ export function HomePage() {
     if (!nextWorkout || !nextWorkout.date) return;
     const workoutDate: Date = new Date(nextWorkout.date as string);
     if (isToday(workoutDate)) {
-      return <Button variant="success">Begin workout</Button>;
+      return (
+        <Button
+          variant="success"
+          onClick={() => history.push("/workout/logs/new")}
+        >
+          Begin workout
+        </Button>
+      );
     }
     return;
   }
@@ -99,7 +103,7 @@ export function HomePage() {
           <h3>Current plan:</h3>
           <WorkoutPlanCard
             showDelete={false}
-            workoutPlan={currentPlan as workoutPlanHeaderData}
+            workoutPlan={currentPlan}
             width={75}
           />
         </>
