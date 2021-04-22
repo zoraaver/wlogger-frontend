@@ -45,7 +45,7 @@ export function WorkoutPlansPage() {
   return (
     <Container
       className="d-flex flex-column justify-content-center align-items-center"
-      style={{ marginLeft: 200, marginTop: 68 }}
+      style={{ marginTop: 68 }}
     >
       <h2>My plans</h2>
       <Alert variant="success" show={!!successMessage}>
@@ -59,6 +59,7 @@ export function WorkoutPlansPage() {
           key={workoutPlan._id}
           workoutPlan={workoutPlan}
           handleShow={handleShow}
+          showDelete={true}
         />
       ))}
       <DeleteModal
