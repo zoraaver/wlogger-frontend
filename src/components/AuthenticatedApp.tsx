@@ -11,6 +11,7 @@ import { WorkoutPlansPage } from "../pages/WorkoutPlansPage";
 import { NewWorkoutLogPage } from "../pages/NewWorkoutLogPage";
 import { WorkoutLogsPage } from "../pages/WorkoutLogsPage";
 import { WorkoutLogPage } from "../pages/WorkoutLogPage";
+import { GeneratedWorkoutLogPage } from "../pages/GeneratedWorkoutLogPage";
 
 export function AuthenticatedApp() {
   return (
@@ -38,6 +39,9 @@ export function AuthenticatedApp() {
         </Route>
         <Route exact path="/plans">
           <WorkoutPlansPage />
+        </Route>
+        <Route exact path="/workout/logs/new">
+          <GeneratedWorkoutLogPage />
         </Route>
         <Route exact path="/logs/new">
           <NewWorkoutLogPage />
