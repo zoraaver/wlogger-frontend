@@ -10,6 +10,7 @@ export interface exerciseData {
   repetitions?: number;
   weight?: number;
   unit: weightUnit;
+  _id?: string;
 }
 
 export interface workoutData {
