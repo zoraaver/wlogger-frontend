@@ -5,42 +5,65 @@ import { WorkoutPlanCard } from "../components/WorkoutPlanCard";
 import {
   deleteWorkoutPlan,
   getWorkoutPlans,
+  patchStartWorkoutPlan,
+  resetError,
   resetSuccess,
   workoutPlanHeaderData,
 } from "../slices/workoutPlansSlice";
 import Alert from "react-bootstrap/Alert";
 import { DeleteModal } from "../components/DeleteModal";
+import { StartModal } from "../components/StartModal";
 
 export function WorkoutPlansPage() {
   const dispatch = useAppDispatch();
-  const [show, setShow] = React.useState(false);
-  const [planToDelete, setPlanToDelete] = React.useState({ name: "", _id: "" });
-
-  function handleShow(_id: string, name: string) {
-    setPlanToDelete({ _id, name });
-    setShow(true);
-  }
-
-  function handleDeleteClick() {
-    dispatch(deleteWorkoutPlan(planToDelete._id));
-    dispatch(resetSuccess(4));
-    setShow(false);
-  }
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [planToDelete, setPlanToDelete] = React.useState({ name: "", id: "" });
+  const [showStartModal, setShowStartModal] = React.useState(false);
+  const [planToStart, setPlanToStart] = React.useState({ name: "", id: "" });
 
   const { data: workoutPlans, success: successMessage, error } = useAppSelector(
     (state) => state.workoutPlans
   );
 
-  const modalTitle: JSX.Element = (
+  React.useEffect(() => {
+    dispatch(getWorkoutPlans());
+  }, []);
+
+  const deleteModalTitle: JSX.Element = (
     <>
       Are you sure you want to delete{" "}
       <strong className="ml-1">{planToDelete.name}</strong>?
     </>
   );
 
-  React.useEffect(() => {
-    dispatch(getWorkoutPlans());
-  }, []);
+  const startModalTitle: JSX.Element = (
+    <>
+      Are you sure you want to start{" "}
+      <strong className="ml-1">{planToStart.name}</strong>?
+    </>
+  );
+
+  function handleShowDeleteModal(id: string, name: string) {
+    setPlanToDelete({ id: id, name });
+    setShowDeleteModal(true);
+  }
+
+  function handleShowStartModal(id: string, name: string) {
+    setPlanToStart({ id: id, name });
+    setShowStartModal(true);
+  }
+
+  function handleDeleteClick() {
+    dispatch(deleteWorkoutPlan(planToDelete.id));
+    dispatch(resetSuccess(4));
+    setShowDeleteModal(false);
+  }
+
+  function handleStartClick() {
+    dispatch(patchStartWorkoutPlan(planToStart.id));
+    dispatch(resetError(4));
+    setShowStartModal(false);
+  }
 
   return (
     <Container
@@ -58,16 +81,24 @@ export function WorkoutPlansPage() {
         <WorkoutPlanCard
           key={workoutPlan._id}
           workoutPlan={workoutPlan}
-          handleShow={handleShow}
+          handleShowDeleteModal={handleShowDeleteModal}
+          handleShowStartModal={handleShowStartModal}
           showDelete={true}
         />
       ))}
       <DeleteModal
-        onHide={() => setShow(false)}
-        show={show}
-        title={modalTitle}
+        onHide={() => setShowDeleteModal(false)}
+        show={showDeleteModal}
+        title={deleteModalTitle}
         handleDeleteClick={handleDeleteClick}
-        handleCloseClick={() => setShow(false)}
+        handleCloseClick={() => setShowDeleteModal(false)}
+      />
+      <StartModal
+        show={showStartModal}
+        title={startModalTitle}
+        onHide={() => setShowStartModal(false)}
+        handleCloseClick={() => setShowStartModal(false)}
+        handleStartClick={handleStartClick}
       />
     </Container>
   );
