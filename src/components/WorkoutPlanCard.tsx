@@ -2,45 +2,41 @@ import * as React from "react";
 import { Pencil, Trash } from "react-bootstrap-icons";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
-import {
-  patchStartWorkoutPlan,
-  resetError,
-  workoutPlanHeaderData,
-} from "../slices/workoutPlansSlice";
-import { useAppDispatch } from "..";
+import { workoutPlanHeaderData } from "../slices/workoutPlansSlice";
 import { useHistory } from "react-router";
 
 interface WorkoutPlanCardProps {
   workoutPlan: workoutPlanHeaderData;
   showDelete?: boolean;
-  handleShow?: (_id: string, name: string) => void;
+  handleShowDeleteModal?: (id: string, name: string) => void;
+  handleShowStartModal?: (id: string, name: string) => void;
   width?: number;
 }
 
 export function WorkoutPlanCard({
   workoutPlan,
-  handleShow,
+  handleShowDeleteModal,
+  handleShowStartModal,
   showDelete,
   width = 50,
 }: WorkoutPlanCardProps) {
-  const dispatch = useAppDispatch();
   const history = useHistory();
   const { name, length, status, _id, start, end } = workoutPlan;
   const widthString: string = `w-${width}`;
 
-  async function handleStartClick() {
-    await dispatch(patchStartWorkoutPlan(_id));
-    dispatch(resetError(4));
-  }
-
   function renderFooter(): JSX.Element | null {
     switch (status) {
       case "Not started":
-        return (
-          <Button className="py-1" onClick={handleStartClick}>
-            Start
-          </Button>
-        );
+        if (handleShowStartModal !== undefined) {
+          return (
+            <Button
+              className="py-1"
+              onClick={() => handleShowStartModal(_id, name)}
+            >
+              Start
+            </Button>
+          );
+        }
       case "In progress":
         return start ? <>Start date: {new Date(start).toDateString()}</> : null;
       case "Completed":
@@ -64,9 +60,9 @@ export function WorkoutPlanCard({
         >
           <Pencil />
         </Button>
-        {showDelete && handleShow ? (
+        {showDelete && handleShowDeleteModal ? (
           <Button
-            onClick={() => handleShow(_id, name)}
+            onClick={() => handleShowDeleteModal(_id, name)}
             variant="danger"
             className="ml-2 mb-0 d-inline-block py-1 px-1"
           >
