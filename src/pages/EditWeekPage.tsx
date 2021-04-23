@@ -12,6 +12,7 @@ import {
   Day,
   deleteEmptyWorkouts,
   getWorkoutPlan,
+  changeWeekRepeat,
   weekData,
 } from "../slices/workoutPlansSlice";
 import { ArrowLeft } from "react-bootstrap-icons";
@@ -19,6 +20,7 @@ import { WorkoutCard } from "../containers/WorkoutCard";
 import { SomethingWentWrongAlert } from "../components/SomethingWentWrongAlert";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { workoutData } from "../slices/workoutsSlice";
+import { calculateModifiedWeekPositions } from "../util/util";
 
 export function EditWeekPage() {
   const params = useParams<{
@@ -31,11 +33,15 @@ export function EditWeekPage() {
   const [day, setDay] = React.useState<Day>("Monday");
   const [alert, setAlert] = React.useState(false);
   const history = useHistory();
-  const week = useAppSelector((state) =>
-    state.workoutPlans.editWorkoutPlan?.weeks.find(
-      (week: weekData) => week.position === position
-    )
+  const weeks = useAppSelector(
+    (state) => state.workoutPlans.editWorkoutPlan?.weeks
+  );
+  const week = weeks?.find(
+    (week: weekData) => week.position === position
   ) as weekData;
+  const weekIndex = weeks?.findIndex(
+    (week: weekData) => week.position === position
+  ) as number;
   const error: string | undefined = useAppSelector(
     (state) => state.workoutPlans.error
   );
@@ -57,6 +63,8 @@ export function EditWeekPage() {
     return <LoadingSpinner />;
   }
 
+  const modifiedPosition: number =
+    weeks === undefined ? 0 : calculateModifiedWeekPositions(weeks)[weekIndex];
   const workouts: workoutData[] = week.workouts;
   const days: Day[] = [
     "Monday",
@@ -67,6 +75,8 @@ export function EditWeekPage() {
     "Saturday",
     "Sunday",
   ];
+
+  const allowedRepeatValues: number[] = [0, 1, 2, 3, 4, 5];
 
   function handleAddWorkout(event: React.FormEvent) {
     event.preventDefault();
@@ -85,9 +95,26 @@ export function EditWeekPage() {
     setDay(value as Day);
   }
 
+  function handleRepeatChange({
+    target: { value },
+  }: React.ChangeEvent<HTMLSelectElement>) {
+    if (!allowedRepeatValues.includes(Number(value), 0)) return;
+    dispatch(
+      changeWeekRepeat({ newRepeat: Number(value), position: week.position })
+    );
+  }
+
   function handleBackClick() {
     dispatch(deleteEmptyWorkouts(position));
     history.push(`/plans/${id ? id : "new"}/weeks`);
+  }
+
+  function renderPageTitle() {
+    if (week.repeat !== 0) {
+      return `Weeks ${modifiedPosition} - ${modifiedPosition + week.repeat}`;
+    } else {
+      return `Week ${modifiedPosition}`;
+    }
   }
 
   return (
@@ -95,7 +122,7 @@ export function EditWeekPage() {
       className="d-flex flex-column justify-content-center align-items-center mt-5"
       style={{ marginLeft: 200 }}
     >
-      <h3 className="my-4">Week {position}</h3>
+      <h3 className="my-4">{renderPageTitle()}</h3>
       <Button onClick={handleBackClick} className="mr-auto">
         <ArrowLeft className="mr-1" />
         Back
@@ -127,6 +154,22 @@ export function EditWeekPage() {
                 >
                   <h5 className="py-0 my-1">+ workout</h5>
                 </Button>
+              </Col>
+              <Col>
+                <Form.Label>Repeat week: </Form.Label>
+                <Form.Control
+                  value={week.repeat}
+                  as="select"
+                  onChange={handleRepeatChange}
+                >
+                  {allowedRepeatValues.map(
+                    (repeatNumber: number, index: number) => (
+                      <option key={index} value={repeatNumber}>
+                        {repeatNumber} time{index === 1 ? null : "s"}
+                      </option>
+                    )
+                  )}
+                </Form.Control>
               </Col>
             </Form.Row>
           </Form>
