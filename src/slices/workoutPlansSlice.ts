@@ -314,6 +314,20 @@ const slice = createSlice({
         );
       }
     },
+    changeWeekRepeat(
+      state,
+      action: PayloadAction<{ position: number; newRepeat: number }>
+    ) {
+      if (!state.editWorkoutPlan) return;
+      const { position, newRepeat } = action.payload;
+      const week: weekData | undefined = state.editWorkoutPlan.weeks.find(
+        (week: weekData) => week.position === position
+      );
+      if (week !== undefined) {
+        week.repeat = newRepeat;
+        state.editWorkoutPlan.length = calculateLength(state.editWorkoutPlan);
+      }
+    },
     setSuccess(state, action: PayloadAction<string | undefined>) {
       state.success = action.payload;
     },
@@ -431,4 +445,5 @@ export const {
   deleteEmptyWorkouts,
   setSuccess,
   setError,
+  changeWeekRepeat,
 } = slice.actions;
