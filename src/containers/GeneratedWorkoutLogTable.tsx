@@ -194,7 +194,7 @@ export function GeneratedWorkoutLogTable({
       return loggedWorkout.exercises[currentExerciseIndex].sets[currentSetIndex]
         .repetitions;
     } else {
-      return workout?.exercises[exerciseIndex].repetitions;
+      return workout?.exercises[currentExerciseIndex].repetitions;
     }
   }
 
