@@ -17,6 +17,7 @@ import {
 import { Week } from "../components/Week";
 import { SomethingWentWrongAlert } from "../components/SomethingWentWrongAlert";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import { calculateModifiedWeekPositions } from "../util/util";
 
 export function EditWorkoutPlanPage() {
   const history = useHistory();
@@ -51,6 +52,10 @@ export function EditWorkoutPlanPage() {
   } else if (id && !workoutPlanData) {
     return <LoadingSpinner />;
   }
+
+  const modifiedWeekPositions: number[] = calculateModifiedWeekPositions(
+    workoutPlanData.weeks
+  );
 
   function handleAddClick() {
     const currentPosition: number = workoutPlanData.weeks.length + 1;
@@ -107,8 +112,12 @@ export function EditWorkoutPlanPage() {
       <Button onClick={handleAddClick} variant="success" className="mt-2">
         + week
       </Button>
-      {workoutPlanData.weeks.map((week: weekData) => (
-        <Week weekData={week} key={week.position} />
+      {workoutPlanData.weeks.map((week: weekData, weekIndex: number) => (
+        <Week
+          weekData={week}
+          key={week.position}
+          modifiedPosition={modifiedWeekPositions[weekIndex]}
+        />
       ))}
     </Container>
   );
