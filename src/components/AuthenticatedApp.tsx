@@ -12,6 +12,8 @@ import { NewWorkoutLogPage } from "../pages/NewWorkoutLogPage";
 import { WorkoutLogsPage } from "../pages/WorkoutLogsPage";
 import { WorkoutLogPage } from "../pages/WorkoutLogPage";
 import { GeneratedWorkoutLogPage } from "../pages/GeneratedWorkoutLogPage";
+import { StatisticsPage } from "../pages/StatisticsPage";
+import { ExercisesPage } from "../pages/ExercisesPage";
 
 export function AuthenticatedApp() {
   return (
@@ -21,6 +23,12 @@ export function AuthenticatedApp() {
       <Switch>
         <Route exact path="/login">
           <Redirect to="/" />
+        </Route>
+        <Route exact path="/statistics">
+          <StatisticsPage />
+        </Route>
+        <Route exact path="/exercises">
+          <ExercisesPage />
         </Route>
         <Route exact path="/plans/new/weeks/:position">
           <EditWeekPage />
