@@ -10,9 +10,13 @@ import { useAppDispatch } from "..";
 
 interface WeekProps {
   weekData: weekData;
+  modifiedPosition: number;
 }
 
-export function Week({ weekData: { repeat, position, workouts } }: WeekProps) {
+export function Week({
+  weekData: { repeat, position, workouts },
+  modifiedPosition,
+}: WeekProps) {
   const history = useHistory();
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
@@ -20,6 +24,15 @@ export function Week({ weekData: { repeat, position, workouts } }: WeekProps) {
   function handleDeleteClick() {
     dispatch(deleteWeek(position));
   }
+
+  function renderTitle() {
+    if (repeat !== 0) {
+      return `Weeks ${modifiedPosition} - ${modifiedPosition + repeat}:`;
+    } else {
+      return `Week ${modifiedPosition}:`;
+    }
+  }
+
   return (
     <Accordion className="w-75 mt-1">
       <Card>
@@ -30,7 +43,7 @@ export function Week({ weekData: { repeat, position, workouts } }: WeekProps) {
             variant="light"
             eventKey="0"
           >
-            <h6 className="d-inline font-weight-bold">Week {position}:</h6>{" "}
+            <h6 className="d-inline font-weight-bold">{renderTitle()}</h6>{" "}
             {workouts.length} workouts
           </Accordion.Toggle>
           <Button
