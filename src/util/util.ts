@@ -44,3 +44,13 @@ export function isTomorrow(date: Date): boolean {
     date.getDate() === today.getDate() + 1
   );
 }
+
+export function calculateModifiedWeekPositions(weeks: weekData[]): number[] {
+  let actualPosition: number = 1;
+  const modifiedPositions: number[] = [];
+  for (const week of weeks) {
+    modifiedPositions.push(actualPosition);
+    actualPosition = actualPosition + week.repeat + 1;
+  }
+  return modifiedPositions;
+}
