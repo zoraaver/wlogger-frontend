@@ -24,26 +24,27 @@ export function WorkoutPlanCard({
   const { name, length, status, _id, start, end } = workoutPlan;
   const widthString: string = `w-${width}`;
 
+  const startButton: JSX.Element = (
+    <Button
+      className="py-1"
+      onClick={() => handleShowStartModal && handleShowStartModal(_id, name)}
+    >
+      Start
+    </Button>
+  );
+
   function renderFooter(): JSX.Element | null {
     switch (status) {
       case "Not started":
-        if (handleShowStartModal !== undefined) {
-          return (
-            <Button
-              className="py-1"
-              onClick={() => handleShowStartModal(_id, name)}
-            >
-              Start
-            </Button>
-          );
-        }
+        return startButton;
       case "In progress":
         return start ? <>Start date: {new Date(start).toDateString()}</> : null;
       case "Completed":
         return start && end ? (
           <>
-            Start date: {new Date(start).toDateString()}
-            <br></br>End date: {new Date(end).toDateString()}
+            <span>Start date: {new Date(start).toDateString()}</span>
+            <span>End date: {new Date(end).toDateString()}</span>
+            {startButton}
           </>
         ) : null;
     }
@@ -75,7 +76,9 @@ export function WorkoutPlanCard({
         <br></br>
         <strong>Status:</strong> {status}
       </Card.Body>
-      <Card.Footer>{renderFooter()}</Card.Footer>
+      <Card.Footer className="d-flex flex-column align-items-start justify-content-between">
+        {renderFooter()}
+      </Card.Footer>
     </Card>
   );
 }
