@@ -21,6 +21,12 @@ export function HomePage() {
   );
   const currentPlan = useAppSelector((state) => state.workoutPlans.currentPlan);
 
+  React.useEffect(() => {
+    dispatch(getCurrentPlan()).then(() => {
+      dispatch(getNextWorkout());
+    });
+  }, []);
+
   function renderHeader() {
     switch (message) {
       case undefined:
@@ -75,11 +81,6 @@ export function HomePage() {
     }
     return;
   }
-
-  React.useEffect(() => {
-    dispatch(getNextWorkout());
-    dispatch(getCurrentPlan());
-  }, []);
 
   return (
     <Container className="mt-5 py-1 d-flex flex-column justify-content-start align-items-center">
