@@ -3,6 +3,7 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
 import { Trash } from "react-bootstrap-icons";
 import { workoutLogHeaderData } from "../slices/workoutLogsSlice";
+import { useHistory } from "react-router";
 
 interface WorkoutLogItemProps {
   workoutLog: workoutLogHeaderData;
@@ -16,6 +17,7 @@ export function WorkoutLogItem({
   handleShow,
 }: WorkoutLogItemProps) {
   const date = new Date(workoutLog.createdAt as string);
+  const history = useHistory();
   return (
     <ListGroup.Item
       key={workoutLog._id}
@@ -28,7 +30,7 @@ export function WorkoutLogItem({
       <Button
         variant="link"
         className="ml-auto my-0 py-0"
-        href={"logs/" + workoutLog._id}
+        onClick={() => history.push(`logs/${workoutLog._id}`)}
       >
         View
       </Button>

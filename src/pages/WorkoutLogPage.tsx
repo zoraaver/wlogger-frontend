@@ -1,7 +1,7 @@
 import * as React from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import { useParams } from "react-router";
+import { useHistory, useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "..";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { WorkoutLogTable } from "../containers/WorkoutLogTable";
@@ -14,6 +14,7 @@ export function WorkoutLogPage() {
   const workoutLog: workoutLogData | undefined = useAppSelector(
     (state) => state.workoutLogs.editWorkoutLog
   );
+  const history = useHistory();
 
   React.useEffect(() => {
     console.log(workoutLog);
@@ -27,7 +28,11 @@ export function WorkoutLogPage() {
   return (
     <Container className="mt-5 d-flex flex-column justify-content-start align-items-center">
       <h3 className="mt-3">{workoutLogDate.toDateString()}</h3>
-      <Button variant="link" href="/logs" className="mr-auto">
+      <Button
+        variant="link"
+        onClick={() => history.push("/logs")}
+        className="mr-auto"
+      >
         <ArrowLeft className="mr-1" />
         Back to Logs
       </Button>
