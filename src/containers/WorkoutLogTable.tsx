@@ -29,7 +29,7 @@ export function WorkoutLogTable() {
   }
 
   return (
-    <Table striped bordered className="mt-4 w-75" variant="dark">
+    <Table striped bordered className="mt-4 w-75 text-center" variant="dark">
       <thead>
         <tr>
           <th>Exercise</th>
