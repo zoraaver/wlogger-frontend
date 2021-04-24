@@ -277,7 +277,7 @@ const slice = createSlice({
       if (weekToDeleteIndex !== undefined && weekToDeleteIndex >= 0) {
         weeks.forEach((week: weekData) => {
           if (week.position > weeks[weekToDeleteIndex].position) {
-            --week.position;
+            week.position = week.position - 1 - weeks[weekToDeleteIndex].repeat;
           }
         });
         state.editWorkoutPlan.weeks.splice(weekToDeleteIndex, 1);
@@ -320,13 +320,19 @@ const slice = createSlice({
     ) {
       if (!state.editWorkoutPlan) return;
       const { position, newRepeat } = action.payload;
-      const week: weekData | undefined = state.editWorkoutPlan.weeks.find(
+      const weekToChange:
+        | weekData
+        | undefined = state.editWorkoutPlan.weeks.find(
         (week: weekData) => week.position === position
       );
-      if (week !== undefined) {
-        week.repeat = newRepeat;
-        state.editWorkoutPlan.length = calculateLength(state.editWorkoutPlan);
-      }
+      if (!weekToChange) return;
+      state.editWorkoutPlan.weeks.forEach((week: weekData) => {
+        if (week.position > weekToChange.position) {
+          week.position = week.position + (newRepeat - weekToChange.repeat);
+        }
+      });
+      weekToChange.repeat = newRepeat;
+      state.editWorkoutPlan.length = calculateLength(state.editWorkoutPlan);
     },
     setSuccess(state, action: PayloadAction<string | undefined>) {
       state.success = action.payload;
