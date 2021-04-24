@@ -7,6 +7,7 @@ import Button from "react-bootstrap/Button";
 import {
   clearEditWorkoutLog,
   postWorkoutLog,
+  resetSuccess,
   workoutLogData,
 } from "../slices/workoutLogsSlice";
 import { GeneratedWorkoutLogTable } from "../containers/GeneratedWorkoutLogTable";
@@ -37,6 +38,7 @@ export function GeneratedWorkoutLogPage() {
   async function handleFinishWorkoutClick() {
     if (!workoutFinished) return;
     await dispatch(postWorkoutLog(workoutLog));
+    dispatch(resetSuccess(4));
     history.push("/logs");
   }
 
