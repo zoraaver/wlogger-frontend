@@ -72,7 +72,7 @@ export function WorkoutPlanCard({
         ) : null}
       </Card.Header>
       <Card.Body>
-        <strong>Length:</strong> {length === 0 ? "Indefinite" : length} weeks
+        <strong>Length:</strong> {length} weeks
         <br></br>
         <strong>Status:</strong> {status}
       </Card.Body>
