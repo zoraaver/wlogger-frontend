@@ -14,7 +14,6 @@ import { WorkoutCard } from "../containers/WorkoutCard";
 import { SomethingWentWrongAlert } from "../components/SomethingWentWrongAlert";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { workoutData } from "../slices/workoutsSlice";
-import { calculateModifiedWeekPositions } from "../util/util";
 import { WeekForm } from "../components/WeekForm";
 
 export function EditWeekPage() {
@@ -26,15 +25,11 @@ export function EditWeekPage() {
   const id: string | undefined = params.id;
 
   const history = useHistory();
-  const weeks = useAppSelector(
-    (state) => state.workoutPlans.editWorkoutPlan?.weeks
-  );
-  const week = weeks?.find(
-    (week: weekData) => week.position === position
+  const week = useAppSelector((state) =>
+    state.workoutPlans.editWorkoutPlan?.weeks.find(
+      (week: weekData) => week.position === position
+    )
   ) as weekData;
-  const weekIndex = weeks?.findIndex(
-    (week: weekData) => week.position === position
-  ) as number;
   const error: string | undefined = useAppSelector(
     (state) => state.workoutPlans.error
   );
@@ -56,8 +51,6 @@ export function EditWeekPage() {
     return <LoadingSpinner />;
   }
 
-  const modifiedPosition: number =
-    weeks === undefined ? 0 : calculateModifiedWeekPositions(weeks)[weekIndex];
   const workouts: workoutData[] = week.workouts;
 
   function handleBackClick() {
@@ -67,9 +60,9 @@ export function EditWeekPage() {
 
   function renderPageTitle() {
     if (week.repeat !== 0) {
-      return `Weeks ${modifiedPosition} - ${modifiedPosition + week.repeat}`;
+      return `Weeks ${week.position} - ${week.position + week.repeat}`;
     } else {
-      return `Week ${modifiedPosition}`;
+      return `Week ${week.position}`;
     }
   }
 

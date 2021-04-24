@@ -10,13 +10,9 @@ import { useAppDispatch } from "..";
 
 interface WeekProps {
   weekData: weekData;
-  modifiedPosition: number;
 }
 
-export function Week({
-  weekData: { repeat, position, workouts },
-  modifiedPosition,
-}: WeekProps) {
+export function Week({ weekData: { repeat, position, workouts } }: WeekProps) {
   const history = useHistory();
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
@@ -27,9 +23,9 @@ export function Week({
 
   function renderTitle() {
     if (repeat !== 0) {
-      return `Weeks ${modifiedPosition} - ${modifiedPosition + repeat}:`;
+      return `Weeks ${position} - ${position + repeat}:`;
     } else {
-      return `Week ${modifiedPosition}:`;
+      return `Week ${position}:`;
     }
   }
 

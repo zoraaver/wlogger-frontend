@@ -17,7 +17,7 @@ import {
 import { Week } from "../components/Week";
 import { SomethingWentWrongAlert } from "../components/SomethingWentWrongAlert";
 import { LoadingSpinner } from "../components/LoadingSpinner";
-import { calculateModifiedWeekPositions } from "../util/util";
+import { calculateLength } from "../util/util";
 
 export function EditWorkoutPlanPage() {
   const history = useHistory();
@@ -53,12 +53,8 @@ export function EditWorkoutPlanPage() {
     return <LoadingSpinner />;
   }
 
-  const modifiedWeekPositions: number[] = calculateModifiedWeekPositions(
-    workoutPlanData.weeks
-  );
-
   function handleAddClick() {
-    const currentPosition: number = workoutPlanData.weeks.length + 1;
+    const currentPosition: number = calculateLength(workoutPlanData) + 1;
     dispatch(addWeek({ position: currentPosition, repeat: 0, workouts: [] }));
     history.push(`/plans/${id ? id : "new"}/weeks/${currentPosition}`);
   }
@@ -113,11 +109,7 @@ export function EditWorkoutPlanPage() {
         + week
       </Button>
       {workoutPlanData.weeks.map((week: weekData, weekIndex: number) => (
-        <Week
-          weekData={week}
-          key={week.position}
-          modifiedPosition={modifiedWeekPositions[weekIndex]}
-        />
+        <Week weekData={week} key={week.position} />
       ))}
     </Container>
   );

@@ -19,12 +19,10 @@ export function renderRestInterval(seconds?: number) {
 export function calculateLength(
   workoutPlanData: workoutPlanData | workoutPlanHeaderData
 ): number {
-  return workoutPlanData.weeks.reduce(
-    (acc: number, curr: weekData | { repeat: number }) => {
-      return acc + curr.repeat + 1;
-    },
-    0
-  );
+  if (workoutPlanData.weeks.length === 0) return 0;
+  const lastWeek: weekData =
+    workoutPlanData.weeks[workoutPlanData.weeks.length - 1];
+  return lastWeek.repeat + lastWeek.position;
 }
 
 export function isToday(date: Date): boolean {
@@ -43,14 +41,4 @@ export function isTomorrow(date: Date): boolean {
     date.getMonth() === today.getMonth() &&
     date.getDate() === today.getDate() + 1
   );
-}
-
-export function calculateModifiedWeekPositions(weeks: weekData[]): number[] {
-  let actualPosition: number = 1;
-  const modifiedPositions: number[] = [];
-  for (const week of weeks) {
-    modifiedPositions.push(actualPosition);
-    actualPosition = actualPosition + week.repeat + 1;
-  }
-  return modifiedPositions;
 }
