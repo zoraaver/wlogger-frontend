@@ -8,6 +8,7 @@ import {
   clearEditWorkoutLog,
   postWorkoutLog,
   resetSuccess,
+  setWorkoutId,
   workoutLogData,
 } from "../slices/workoutLogsSlice";
 import { GeneratedWorkoutLogTable } from "../containers/GeneratedWorkoutLogTable";
@@ -26,6 +27,7 @@ export function GeneratedWorkoutLogPage() {
 
   React.useEffect(() => {
     dispatch(clearEditWorkoutLog());
+    dispatch(setWorkoutId(workout._id));
   }, []);
 
   const [positionInWorkout, setPositionInWorkout] = React.useState({
