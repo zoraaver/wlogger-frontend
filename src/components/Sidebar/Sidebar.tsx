@@ -9,7 +9,7 @@ export function Sidebar() {
   const sidebarOpen: boolean = useAppSelector((state) => state.UI.sidebarOpen);
   const history = useHistory();
   return (
-    <Fade in={sidebarOpen}>
+    <Fade in={sidebarOpen} unmountOnExit={true}>
       <div className="sidenav">
         <Nav.Link
           as="button"
