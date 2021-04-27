@@ -57,7 +57,7 @@ export function Week({ weekData: { repeat, position, workouts } }: WeekProps) {
         </Card.Header>
 
         <Accordion.Collapse eventKey="0">
-          <WorkoutTable workouts={workouts} />
+          <WorkoutTable workouts={workouts} weekPosition={position} />
         </Accordion.Collapse>
       </Card>
     </Accordion>
