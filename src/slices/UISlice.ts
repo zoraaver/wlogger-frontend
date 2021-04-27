@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState = { sidebarOpen: false };
+const initialState = { sidebarOpen: true };
 
 const slice = createSlice({
   initialState,
