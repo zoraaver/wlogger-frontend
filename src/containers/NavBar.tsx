@@ -24,13 +24,13 @@ export function Navbar() {
   return (
     <Bootstrap.Navbar bg="info" fixed="top" variant="dark">
       {authenticated ? (
-        <Nav.Link
+        <Nav.Item
           as="button"
           onClick={() => dispatch(toggleSidebar())}
           className="btn p-2 mr-2"
         >
           <LayoutSidebar />
-        </Nav.Link>
+        </Nav.Item>
       ) : null}
       <Bootstrap.Navbar.Brand style={{ fontFamily: "Balsamiq Sans" }}>
         wLogger
