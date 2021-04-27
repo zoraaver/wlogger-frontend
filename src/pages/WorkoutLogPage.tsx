@@ -17,11 +17,11 @@ export function WorkoutLogPage() {
   const history = useHistory();
 
   React.useEffect(() => {
-    console.log(workoutLog);
-    if (!workoutLog?.createdAt) dispatch(getWorkoutLog(id));
+    if (workoutLog._id !== id) dispatch(getWorkoutLog(id));
   }, []);
 
-  if (!workoutLog?.createdAt) return <LoadingSpinner />;
+  if (!workoutLog?.createdAt || workoutLog._id !== id)
+    return <LoadingSpinner />;
 
   const workoutLogDate: Date = new Date(workoutLog.createdAt);
 
