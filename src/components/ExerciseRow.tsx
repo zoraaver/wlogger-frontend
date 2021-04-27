@@ -2,8 +2,9 @@ import * as React from "react";
 import Button from "react-bootstrap/Button";
 import { Day, deleteExercise } from "../slices/workoutPlansSlice";
 import { Trash } from "react-bootstrap-icons";
-import { useAppDispatch } from "..";
+import { useAppDispatch, useAppSelector } from "..";
 import { exerciseData } from "../slices/workoutsSlice";
+import { renderAutoIncrementField } from "../util/util";
 
 interface ExerciseRowProps {
   exerciseData: exerciseData;
@@ -12,12 +13,18 @@ interface ExerciseRowProps {
   index?: number;
 }
 export function ExerciseRow({
-  exerciseData: { name, sets, repetitions, weight, unit },
+  exerciseData: { name, sets, repetitions, weight, unit, autoIncrement },
   day,
   weekPosition,
   index,
 }: ExerciseRowProps) {
   const dispatch = useAppDispatch();
+  const weekRepeat: number | undefined = useAppSelector(
+    (state) =>
+      state.workoutPlans.editWorkoutPlan?.weeks.find(
+        (week) => week.position === weekPosition
+      )?.repeat
+  );
 
   function handleDeleteClick() {
     if (
@@ -38,6 +45,17 @@ export function ExerciseRow({
       <td>
         {weight} {unit}
       </td>
+      {weekRepeat ? (
+        <td>
+          {autoIncrement
+            ? `${autoIncrement.amount} ${renderAutoIncrementField(
+                autoIncrement.field,
+                unit
+              )}`
+            : "-"}
+        </td>
+      ) : null}
+
       {weekPosition && day ? (
         <td className="text-center">
           <Button
