@@ -1,8 +1,10 @@
 import {
   weekData,
+  weightUnit,
   workoutPlanData,
   workoutPlanHeaderData,
 } from "../slices/workoutPlansSlice";
+import { incrementField } from "../slices/workoutsSlice";
 
 export function renderRestInterval(seconds?: number) {
   if (seconds === undefined) return "-";
@@ -41,4 +43,18 @@ export function isTomorrow(date: Date): boolean {
     date.getMonth() === today.getMonth() &&
     date.getDate() === today.getDate() + 1
   );
+}
+
+export function renderAutoIncrementField(
+  field: incrementField,
+  unit: weightUnit
+): string {
+  switch (field) {
+    case "repetitions":
+      return "reps";
+    case "weight":
+      return unit;
+    case "sets":
+      return "sets";
+  }
 }
