@@ -1,5 +1,7 @@
 import * as React from "react";
 import Container from "react-bootstrap/Container";
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
 import { useAppDispatch, useAppSelector } from "..";
 import { WorkoutPlanCard } from "../components/WorkoutPlanCard";
 import {
@@ -13,9 +15,11 @@ import {
 import Alert from "react-bootstrap/Alert";
 import { DeleteModal } from "../components/DeleteModal";
 import { StartModal } from "../components/StartModal";
+import { useHistory } from "react-router-dom";
 
 export function WorkoutPlansPage() {
   const dispatch = useAppDispatch();
+  const history = useHistory();
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const [planToDelete, setPlanToDelete] = React.useState({ name: "", id: "" });
   const [showStartModal, setShowStartModal] = React.useState(false);
@@ -77,15 +81,28 @@ export function WorkoutPlansPage() {
       <Alert variant="danger" show={!!error}>
         {error}
       </Alert>
-      {workoutPlans.map((workoutPlan: workoutPlanHeaderData) => (
-        <WorkoutPlanCard
-          key={workoutPlan._id}
-          workoutPlan={workoutPlan}
-          handleShowDeleteModal={handleShowDeleteModal}
-          handleShowStartModal={handleShowStartModal}
-          showDelete={true}
-        />
-      ))}
+      {workoutPlans.length === 0 ? (
+        <Card className="mt-3 w-50 text-center">
+          <Card.Header>
+            Looks like you don't have any workout plans yet!
+          </Card.Header>
+          <Card.Body>
+            <Button className="py-1" onClick={() => history.push("/plans/new")}>
+              Create a new workout plan
+            </Button>
+          </Card.Body>
+        </Card>
+      ) : (
+        workoutPlans.map((workoutPlan: workoutPlanHeaderData) => (
+          <WorkoutPlanCard
+            key={workoutPlan._id}
+            workoutPlan={workoutPlan}
+            handleShowDeleteModal={handleShowDeleteModal}
+            handleShowStartModal={handleShowStartModal}
+            showDelete={true}
+          />
+        ))
+      )}
       <DeleteModal
         onHide={() => setShowDeleteModal(false)}
         show={showDeleteModal}
