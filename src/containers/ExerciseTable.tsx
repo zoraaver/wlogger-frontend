@@ -2,6 +2,7 @@ import * as React from "react";
 import { exerciseData, workoutData } from "../slices/workoutsSlice";
 import Table from "react-bootstrap/Table";
 import { ExerciseRow } from "../components/ExerciseRow";
+import { useAppSelector } from "..";
 
 interface ExerciseTableProps {
   workout: workoutData;
@@ -13,6 +14,13 @@ export function ExerciseTable({
   weekPosition,
   width,
 }: ExerciseTableProps) {
+  const weekRepeat: number | undefined = useAppSelector(
+    (state) =>
+      state.workoutPlans.editWorkoutPlan?.weeks.find(
+        (week) => week.position === weekPosition
+      )?.repeat
+  );
+
   return (
     <Table className={width ? "w-" + width : ""} striped bordered>
       <thead>
@@ -20,6 +28,7 @@ export function ExerciseTable({
           <th>Exercise name</th>
           <th>Sets x reps</th>
           <th>Weight</th>
+          {weekRepeat ? <th>Auto-increment</th> : null}
         </tr>
       </thead>
       <tbody>
