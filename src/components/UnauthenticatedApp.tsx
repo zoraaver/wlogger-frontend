@@ -1,7 +1,6 @@
 import * as React from "react";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 import { LoginPage } from "../pages/LoginPage";
-import { NotFoundPage } from "../pages/NotFoundPage";
 import { VerifyPage } from "../pages/VerifyPage";
 import { Navbar } from "../containers/NavBar";
 
@@ -17,7 +16,7 @@ export function UnauthenticatedApp() {
           <VerifyPage />
         </Route>
         <Route path="*">
-          <NotFoundPage />
+          <Redirect to="/login" />
         </Route>
       </Switch>
     </>
