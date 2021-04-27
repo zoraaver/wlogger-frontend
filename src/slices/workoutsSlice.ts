@@ -3,6 +3,13 @@ import { AxiosResponse } from "axios";
 import { API } from "../config/axios.config";
 import { weightUnit, Day, workoutPlansUrl } from "./workoutPlansSlice";
 
+export type incrementField = "weight" | "repetitions" | "sets";
+export const incrementFields: incrementField[] = [
+  "repetitions",
+  "sets",
+  "weight",
+];
+
 export interface exerciseData {
   name: string;
   restInterval?: number;
@@ -11,11 +18,13 @@ export interface exerciseData {
   weight?: number;
   unit: weightUnit;
   _id?: string;
+  autoIncrement?: { field: incrementField; amount: number };
 }
 
 export interface workoutData {
   dayOfWeek: Day;
   date?: string;
+  _id?: string;
   exercises: Array<exerciseData>;
 }
 
