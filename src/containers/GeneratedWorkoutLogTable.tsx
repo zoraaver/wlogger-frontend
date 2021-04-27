@@ -122,6 +122,7 @@ export function GeneratedWorkoutLogTable({
         restInterval: formData.restInterval,
         unit: exercise.unit,
         weight: exercise.weight as number,
+        exerciseId: exercise._id,
       })
     );
     if (workoutFinished) {
