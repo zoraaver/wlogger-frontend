@@ -10,6 +10,7 @@ export interface workoutLogData {
   createdAt?: string;
   updatedAt?: string;
   _id?: string;
+  workoutId?: string;
 }
 
 interface workoutLogState {
@@ -32,10 +33,12 @@ export interface EntryData {
   weight: number;
   unit: weightUnit;
   restInterval: number;
+  exerciseId?: string;
 }
 
 export interface exerciseLogData {
   name: string;
+  exerciseId?: string;
   sets: Array<setLogData>;
 }
 
@@ -126,7 +129,14 @@ const slice = createSlice({
   initialState,
   reducers: {
     addSet(state, action: PayloadAction<EntryData>) {
-      const { name, repetitions, weight, unit, restInterval } = action.payload;
+      const {
+        name,
+        repetitions,
+        weight,
+        unit,
+        restInterval,
+        exerciseId,
+      } = action.payload;
       const exercises = state.editWorkoutLog.exercises;
       const lastLoggedExercise =
         exercises.length > 0 ? exercises[exercises.length - 1] : undefined;
@@ -140,9 +150,13 @@ const slice = createSlice({
       } else {
         exercises.push({
           name,
+          exerciseId,
           sets: [{ weight, unit, repetitions, restInterval }],
         });
       }
+    },
+    setWorkoutId(state, action: PayloadAction<string | undefined>) {
+      state.editWorkoutLog.workoutId = action.payload;
     },
     setSuccess(state, action: PayloadAction<string | undefined>) {
       state.success = action.payload;
@@ -197,4 +211,9 @@ const slice = createSlice({
 });
 
 export const workoutLogsReducer = slice.reducer;
-export const { addSet, setSuccess, clearEditWorkoutLog } = slice.actions;
+export const {
+  addSet,
+  setSuccess,
+  clearEditWorkoutLog,
+  setWorkoutId,
+} = slice.actions;
