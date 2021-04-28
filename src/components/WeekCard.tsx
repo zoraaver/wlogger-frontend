@@ -8,11 +8,13 @@ import { Pencil, Trash } from "react-bootstrap-icons";
 import { WorkoutTable } from "../containers/WorkoutTable";
 import { useAppDispatch } from "..";
 
-interface WeekProps {
+interface WeekCardProps {
   weekData: weekData;
 }
 
-export function Week({ weekData: { repeat, position, workouts } }: WeekProps) {
+export function WeekCard({
+  weekData: { repeat, position, workouts },
+}: WeekCardProps) {
   const history = useHistory();
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
@@ -40,7 +42,7 @@ export function Week({ weekData: { repeat, position, workouts } }: WeekProps) {
             eventKey="0"
           >
             <h6 className="d-inline font-weight-bold">{renderTitle()}</h6>{" "}
-            {workouts.length} workouts
+            {workouts.length} workout{workouts.length !== 1 ? "s" : ""}
           </Accordion.Toggle>
           <Button
             className="mx-2"

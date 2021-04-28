@@ -14,7 +14,7 @@ import {
   patchWorkoutPlan,
   resetSuccess,
 } from "../slices/workoutPlansSlice";
-import { Week } from "../components/Week";
+import { WeekCard } from "../components/WeekCard";
 import { SomethingWentWrongAlert } from "../components/SomethingWentWrongAlert";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { calculateLength } from "../util/util";
@@ -109,7 +109,7 @@ export function EditWorkoutPlanPage() {
         + week
       </Button>
       {workoutPlanData.weeks.map((week: weekData, weekIndex: number) => (
-        <Week weekData={week} key={week.position} />
+        <WeekCard weekData={week} key={week.position} />
       ))}
     </Container>
   );
