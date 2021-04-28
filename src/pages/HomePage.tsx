@@ -42,7 +42,7 @@ export function HomePage() {
     if (isToday(workoutDate)) {
       return "Today's workout:";
     } else if (isTomorrow(workoutDate)) {
-      return "Tomorrow's workout";
+      return "Tomorrow's workout:";
     } else {
       return `Next workout: ${workoutDate.toDateString()}`;
     }
@@ -76,6 +76,12 @@ export function HomePage() {
           onClick={() => history.push("/workout/logs/new")}
         >
           Begin workout
+        </Button>
+      );
+    } else {
+      return (
+        <Button variant="success" onClick={() => history.push("/logs/new")}>
+          Log a separate workout
         </Button>
       );
     }
