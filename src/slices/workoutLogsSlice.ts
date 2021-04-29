@@ -18,6 +18,9 @@ interface workoutLogState {
   error?: string;
   data: Array<workoutLogHeaderData>;
   editWorkoutLog: workoutLogData;
+  formVideos?: FormData;
+  formVideoError?: string;
+  logCreationPending: boolean;
 }
 
 export interface workoutLogHeaderData {
@@ -45,17 +48,76 @@ export interface exerciseLogData {
 export interface setLogData {
   weight: number;
   repetitions: number;
+  formVideo?: string;
   restInterval?: number;
   unit: weightUnit;
 }
 
+let logFormData = new FormData();
+export type WorkoutLogPosition = { setIndex: number; exerciseIndex: number };
+type videoFileExtension = "mp4" | "mkv" | "mov";
+const validVideoFileExtensions: videoFileExtension[] = ["mov", "mp4", "mkv"];
+
+export const addFormVideo = createAsyncThunk(
+  "workoutLogs/addFormVideo",
+  async (
+    { file, setIndex, exerciseIndex }: WorkoutLogPosition & { file: File },
+    { dispatch }
+  ) => {
+    const megaByte = 1000000;
+    const fileExtension = file.name.split(".").pop();
+    if (
+      !fileExtension ||
+      !validVideoFileExtensions.includes(fileExtension as videoFileExtension)
+    ) {
+      dispatch(
+        setFormVideoError(
+          `${fileExtension} is not an allowed file type: Allowed types are 'mov', 'mp4' and 'avi'`
+        )
+      );
+    } else if (file.size > 50 * megaByte) {
+      dispatch(setFormVideoError(`File size cannot exceed 50 MB`));
+    } else {
+      logFormData.append("formVideos", file);
+      dispatch(setFormVideo({ exerciseIndex, setIndex, fileName: file.name }));
+    }
+  }
+);
+
+export const removeFormVideo = createAsyncThunk(
+  "workoutLogs/removeFormVideo",
+  async (position: WorkoutLogPosition, { getState, dispatch }) => {
+    const { setIndex, exerciseIndex } = position;
+    const fileName = (getState() as any).workoutLogs.editWorkoutLog.exercises[
+      exerciseIndex
+    ].sets[setIndex].formVideo;
+    logFormData.delete(fileName);
+    for (const value of logFormData.values()) {
+      console.log(value);
+    }
+    dispatch(setFormVideo(position));
+  }
+);
+
+export const clearFormVideos = createAsyncThunk(
+  "workoutLogs/clearFormVideos",
+  async () => {
+    logFormData = new FormData();
+  }
+);
+
 export const postWorkoutLog = createAsyncThunk(
   "workoutLogs/postWorkoutLog",
-  async (data: workoutLogData) => {
+  async (logData: workoutLogData) => {
+    const dataToSend = new FormData();
+    dataToSend.set("workoutLog", JSON.stringify(logData));
+    logFormData.forEach((value: FormDataEntryValue, key: string) => {
+      dataToSend.append(key, value);
+    });
     try {
       const response: AxiosResponse<workoutLogData> = await API.post(
         workoutLogUrl,
-        data
+        dataToSend
       );
       return response.data;
     } catch (error) {
@@ -122,6 +184,7 @@ export const resetSuccess = createAsyncThunk(
 const initialState: workoutLogState = {
   data: [],
   editWorkoutLog: { exercises: [], createdAt: undefined },
+  logCreationPending: false,
 };
 
 const slice = createSlice({
@@ -164,17 +227,35 @@ const slice = createSlice({
     clearEditWorkoutLog(state, action: PayloadAction<void>) {
       state.editWorkoutLog = { exercises: [], createdAt: undefined };
     },
+    setFormVideo(
+      state,
+      action: PayloadAction<WorkoutLogPosition & { fileName?: string }>
+    ) {
+      const { setIndex, exerciseIndex, fileName } = action.payload;
+      state.formVideoError = undefined;
+      state.editWorkoutLog.exercises[exerciseIndex].sets[
+        setIndex
+      ].formVideo = fileName;
+    },
+    setFormVideoError(state, action: PayloadAction<string | undefined>) {
+      state.formVideoError = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(
       postWorkoutLog.fulfilled,
       (state, action: PayloadAction<workoutLogData>) => {
         const dateLogged: Date = new Date(action.payload.createdAt as string);
+        state.logCreationPending = false;
         state.success = `Successfully logged workout on ${dateLogged.toLocaleString()}`;
       }
     );
+    builder.addCase(postWorkoutLog.pending, (state, action) => {
+      state.logCreationPending = true;
+    });
     builder.addCase(postWorkoutLog.rejected, (state, action) => {
       state.editWorkoutLog = { exercises: [] };
+      state.logCreationPending = false;
       console.error(action.error.message);
     });
     builder.addCase(
@@ -216,4 +297,6 @@ export const {
   setSuccess,
   clearEditWorkoutLog,
   setWorkoutId,
+  setFormVideo,
+  setFormVideoError,
 } = slice.actions;
