@@ -1,6 +1,8 @@
 import * as React from "react";
 import Table from "react-bootstrap/Table";
 import { useAppSelector } from "..";
+import { LogVideoFileInput } from "../components/LogVideoFileInput";
+import { RemoveVideoFileInput } from "../components/RemoveVideoFileInput";
 import { exerciseLogData, setLogData } from "../slices/workoutLogsSlice";
 import { renderRestInterval } from "../util/util";
 
@@ -12,10 +14,10 @@ export function WorkoutLogTable() {
   if (!exercises) return <></>;
 
   function renderRows() {
-    return exercises?.map((exercise: exerciseLogData, index: number) =>
-      exercise.sets.map((set: setLogData, index: number) => (
-        <tr key={index}>
-          {index === 0 ? (
+    return exercises?.map((exercise: exerciseLogData, exerciseIndex: number) =>
+      exercise.sets.map((set: setLogData, setIndex: number) => (
+        <tr key={setIndex}>
+          {setIndex === 0 ? (
             <td rowSpan={exercise.sets.length}>{exercise.name}</td>
           ) : null}
           <td>{set.repetitions}</td>
@@ -23,6 +25,19 @@ export function WorkoutLogTable() {
             {set.weight} {set.unit}
           </td>
           <td>{renderRestInterval(set.restInterval)}</td>
+          <td>
+            {set.formVideo ? (
+              <RemoveVideoFileInput
+                setIndex={setIndex}
+                exerciseIndex={exerciseIndex}
+              />
+            ) : (
+              <LogVideoFileInput
+                setIndex={setIndex}
+                exerciseIndex={exerciseIndex}
+              />
+            )}
+          </td>
         </tr>
       ))
     );
@@ -36,6 +51,7 @@ export function WorkoutLogTable() {
           <th>Reps</th>
           <th>Weight</th>
           <th>Rest Interval (mm:ss)</th>
+          <th>Form video</th>
         </tr>
       </thead>
       <tbody>{renderRows()}</tbody>
