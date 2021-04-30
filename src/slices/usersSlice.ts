@@ -6,6 +6,7 @@ const loginUrl = "/auth/login";
 const googleLoginUrl = "/auth/google";
 const validateUrl = "/auth/validate";
 const verifyUrl = "/auth/verify";
+const logoutUrl = "/auth/logout";
 const usersUrl = "/users";
 
 interface userLoginData {
@@ -19,7 +20,6 @@ type userSignupData = userLoginData & {
 
 interface userData {
   email: string;
-  token: string;
 }
 
 export const loginUser = createAsyncThunk(
@@ -30,7 +30,6 @@ export const loginUser = createAsyncThunk(
         loginUrl,
         formData
       );
-      localStorage.setItem("token", response.data.user.token);
       return response.data.user;
     } catch (error) {
       if (error.response) return Promise.reject(error.response.data);
@@ -46,7 +45,6 @@ export const googleLoginUser = createAsyncThunk(
       const response: AxiosResponse<{
         user: userData;
       }> = await API.post(googleLoginUrl, { idToken });
-      localStorage.setItem("token", response.data.user.token);
       return response.data.user;
     } catch (error) {
       if (error.response) return Promise.reject(error.response.data);
@@ -77,7 +75,6 @@ export const verifyUser = createAsyncThunk(
           verificationToken,
         }
       );
-      localStorage.setItem("token", response.data.user.token);
       return response.data.user;
     } catch (error) {
       if (error.response) return Promise.reject(error.response.data);
@@ -100,6 +97,16 @@ export const signupUser = createAsyncThunk(
     }
   }
 );
+
+export const logoutUser = createAsyncThunk("users/logoutUser", async () => {
+  try {
+    const response: AxiosResponse<null> = await API.get(logoutUrl);
+    return response.data;
+  } catch (error) {
+    if (error.response) return Promise.reject(error.response.data);
+    return Promise.reject(error);
+  }
+});
 
 interface signupError {
   field: string;
@@ -130,10 +137,6 @@ const slice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    logoutUser(state, action: PayloadAction<void>) {
-      state.data = null;
-      state.authenticationStatus = "unknown";
-    },
     setAuthenticationStatus(
       state,
       action: PayloadAction<authenticationStatus>
@@ -222,8 +225,17 @@ const slice = createSlice({
         state.signupSuccess = undefined;
       }
     );
+    builder.addCase(
+      logoutUser.fulfilled,
+      (state, action: PayloadAction<null>) => {
+        state.data = null;
+        state.authenticationStatus = "unknown";
+      }
+    );
+    builder.addCase(logoutUser.pending, (state, action) => {
+      state.authenticationStatus = "pending";
+    });
   },
 });
 
-export const { logoutUser, setAuthenticationStatus } = slice.actions;
 export const userReducer = slice.reducer;
