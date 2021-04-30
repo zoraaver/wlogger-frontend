@@ -16,9 +16,7 @@ export function Navbar() {
   const history = useHistory();
 
   function logout() {
-    localStorage.clear();
     dispatch(logoutUser());
-    history.push("/login");
   }
 
   return (
