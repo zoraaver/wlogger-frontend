@@ -1,47 +1,18 @@
 import * as React from "react";
 import Table from "react-bootstrap/Table";
 import { useAppSelector } from "..";
-import { LogVideoFileInput } from "../components/LogVideoFileInput";
-import { RemoveVideoFileInput } from "../components/RemoveVideoFileInput";
+import { WorkoutLogRow } from "../components/WorkoutLogRow";
 import { exerciseLogData, setLogData } from "../slices/workoutLogsSlice";
-import { renderRestInterval } from "../util/util";
 
-export function WorkoutLogTable() {
+interface WorkoutLogTableProps {
+  edit: boolean;
+}
+export function WorkoutLogTable({ edit }: WorkoutLogTableProps) {
   const exercises: exerciseLogData[] | undefined = useAppSelector(
     (state) => state.workoutLogs.editWorkoutLog?.exercises
   );
 
   if (!exercises) return <></>;
-
-  function renderRows() {
-    return exercises?.map((exercise: exerciseLogData, exerciseIndex: number) =>
-      exercise.sets.map((set: setLogData, setIndex: number) => (
-        <tr key={setIndex}>
-          {setIndex === 0 ? (
-            <td rowSpan={exercise.sets.length}>{exercise.name}</td>
-          ) : null}
-          <td>{set.repetitions}</td>
-          <td>
-            {set.weight} {set.unit}
-          </td>
-          <td>{renderRestInterval(set.restInterval)}</td>
-          <td>
-            {set.formVideo ? (
-              <RemoveVideoFileInput
-                setIndex={setIndex}
-                exerciseIndex={exerciseIndex}
-              />
-            ) : (
-              <LogVideoFileInput
-                setIndex={setIndex}
-                exerciseIndex={exerciseIndex}
-              />
-            )}
-          </td>
-        </tr>
-      ))
-    );
-  }
 
   return (
     <Table striped bordered className="mt-4 w-75 text-center" variant="dark">
@@ -54,7 +25,17 @@ export function WorkoutLogTable() {
           <th>Form video</th>
         </tr>
       </thead>
-      <tbody>{renderRows()}</tbody>
+      <tbody>
+        {exercises.map((exercise: exerciseLogData, exerciseIndex: number) =>
+          exercise.sets.map((set: setLogData, setIndex: number) => (
+            <WorkoutLogRow
+              setIndex={setIndex}
+              exerciseIndex={exerciseIndex}
+              edit={edit}
+            />
+          ))
+        )}
+      </tbody>
     </Table>
   );
 }
