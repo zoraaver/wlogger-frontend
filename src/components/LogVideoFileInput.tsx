@@ -19,11 +19,10 @@ export function LogVideoFileInput({
   }
 
   return (
-    <Form.Label className="btn py-0 my-0 text-light" htmlFor="formVideo">
+    <Form.Label className="btn py-0 my-0 text-light">
       <Form.File.Input
         style={{ display: "none" }}
         accept="video/quicktime,video/mp4,video/x-msvideo"
-        id="formVideo"
         onChange={handleFileChange}
       />
       <Paperclip />
