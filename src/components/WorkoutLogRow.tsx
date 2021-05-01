@@ -1,47 +1,42 @@
 import * as React from "react";
-import { useAppSelector } from "..";
+import { useAppDispatch, useAppSelector } from "..";
 import {
   exerciseLogData,
+  setCurrentSetVideo,
   setLogData,
   WorkoutLogPosition,
 } from "../slices/workoutLogsSlice";
 import { renderRestInterval } from "../util/util";
 import { LogVideoFileInput } from "./LogVideoFileInput";
 import { RemoveVideoFileInput } from "./RemoveVideoFileInput";
-// import { Video } from "react-video-stream";
-// import { baseURL } from "../config/axios.config";
+import { PlayCircle } from "react-bootstrap-icons";
+// import Button from "react-bootstrap/Button";
 
 export function WorkoutLogRow({
   setIndex,
   exerciseIndex,
   edit,
 }: WorkoutLogPosition & { edit: boolean }) {
+  const dispatch = useAppDispatch();
   const exercise: exerciseLogData = useAppSelector(
     (state) => state.workoutLogs.editWorkoutLog.exercises[exerciseIndex]
   );
-  //   const workoutLogId = useAppSelector(
-  //     (state) => state.workoutLogs.editWorkoutLog._id
-  //   ) as string;
   const set: setLogData = exercise.sets[setIndex];
 
   function renderVideoCell(): JSX.Element {
-    if (!edit && !set.formVideoSize) {
+    if (!edit && !set.formVideo) {
       return <>-</>;
     } else if (!edit) {
       return (
-        <>
-          {/* <Video
-            controls={true}
-            autoPlay={false}
-            options={{
-              requestHeader: "Authorization",
-              requestToken: token,
-            }}
-            remoteUrl={`${baseURL}/workoutLogs/${workoutLogId}/${exerciseIndex}/${setIndex}/videoDownload`}
-          /> */}
-        </>
+        <PlayCircle
+          size={25}
+          color="white"
+          onClick={() =>
+            dispatch(setCurrentSetVideo({ setIndex, exerciseIndex }))
+          }
+        />
       );
-    } else if (set.formVideo) {
+    } else if (set.formVideoName) {
       return (
         <RemoveVideoFileInput
           setIndex={setIndex}
