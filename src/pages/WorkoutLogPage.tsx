@@ -7,6 +7,7 @@ import { LoadingSpinner } from "../components/LoadingSpinner";
 import { WorkoutLogTable } from "../containers/WorkoutLogTable";
 import { getWorkoutLog, workoutLogData } from "../slices/workoutLogsSlice";
 import { ArrowLeft } from "react-bootstrap-icons";
+import { VideoModal } from "../components/VideoModal";
 
 export function WorkoutLogPage() {
   const dispatch = useAppDispatch();
@@ -36,7 +37,8 @@ export function WorkoutLogPage() {
         <ArrowLeft className="mr-1" />
         Back to Logs
       </Button>
-      <WorkoutLogTable />
+      <WorkoutLogTable edit={false} />
+      <VideoModal />
     </Container>
   );
 }
