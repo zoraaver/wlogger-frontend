@@ -20,6 +20,7 @@ interface workoutLogState {
   editWorkoutLog: workoutLogData;
   formVideoError?: string;
   videoUploadInProgress: boolean;
+  currentVideoPlaying?: WorkoutLogPosition;
 }
 
 export interface workoutLogHeaderData {
@@ -47,8 +48,8 @@ export interface exerciseLogData {
 export interface setLogData {
   weight: number;
   repetitions: number;
-  formVideo?: string;
-  formVideoSize?: number;
+  formVideoName?: string;
+  formVideo?: { size: number; extension: videoFileExtension };
   restInterval?: number;
   unit: weightUnit;
 }
@@ -88,7 +89,6 @@ export const addFormVideo = createAsyncThunk(
       logVideoFiles.push({ file, setIndex, exerciseIndex });
       dispatch(setFormVideo({ exerciseIndex, setIndex, fileName: file.name }));
     }
-    console.log(logVideoFiles);
   }
 );
 
@@ -104,7 +104,6 @@ export const removeFormVideo = createAsyncThunk(
       logVideoFiles.splice(fileToRemoveIndex, 1);
     }
     dispatch(setFormVideo(position));
-    console.log(logVideoFiles);
   }
 );
 
@@ -265,10 +264,16 @@ const slice = createSlice({
       state.formVideoError = undefined;
       state.editWorkoutLog.exercises[exerciseIndex].sets[
         setIndex
-      ].formVideo = fileName;
+      ].formVideoName = fileName;
     },
     setFormVideoError(state, action: PayloadAction<string | undefined>) {
       state.formVideoError = action.payload;
+    },
+    setCurrentSetVideo(
+      state,
+      action: PayloadAction<WorkoutLogPosition | undefined>
+    ) {
+      state.currentVideoPlaying = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -334,4 +339,5 @@ export const {
   setWorkoutId,
   setFormVideo,
   setFormVideoError,
+  setCurrentSetVideo,
 } = slice.actions;
