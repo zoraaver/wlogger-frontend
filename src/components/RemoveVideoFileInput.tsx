@@ -14,7 +14,7 @@ export function RemoveVideoFileInput({
   const formVideo = useAppSelector(
     (state) =>
       state.workoutLogs.editWorkoutLog.exercises[exerciseIndex].sets[setIndex]
-        .formVideo
+        .formVideoName
   );
   return (
     <>
