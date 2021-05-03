@@ -29,6 +29,7 @@ export function WorkoutLogTable({ edit }: WorkoutLogTableProps) {
         {exercises.map((exercise: exerciseLogData, exerciseIndex: number) =>
           exercise.sets.map((set: setLogData, setIndex: number) => (
             <WorkoutLogRow
+              key={setIndex}
               setIndex={setIndex}
               exerciseIndex={exerciseIndex}
               edit={edit}
