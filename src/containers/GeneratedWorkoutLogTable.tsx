@@ -1,10 +1,11 @@
 import * as React from "react";
 import { Button, Form } from "react-bootstrap";
-import { Check } from "react-bootstrap-icons";
 import Table from "react-bootstrap/Table";
 import { useAppDispatch, useAppSelector } from "..";
 import { GeneratedWorkoutLogRow } from "../components/GeneratedWorkoutLogRow";
-import { addSet, workoutLogData } from "../slices/workoutLogsSlice";
+import { LogVideoFileInput } from "../components/LogVideoFileInput";
+import { RemoveVideoFileInput } from "../components/RemoveVideoFileInput";
+import { addSet, setLogData, workoutLogData } from "../slices/workoutLogsSlice";
 import { exerciseData, workoutData } from "../slices/workoutsSlice";
 import { renderRestInterval } from "../util/util";
 
@@ -166,7 +167,23 @@ export function GeneratedWorkoutLogTable({
         </Button>
       );
     } else if (setFinished(currentSetIndex, currentExerciseIndex)) {
-      return <Check size={25} className="text-success"></Check>;
+      const set: setLogData =
+        loggedWorkout.exercises[currentExerciseIndex].sets[currentSetIndex];
+      if (set.formVideoName) {
+        return (
+          <RemoveVideoFileInput
+            setIndex={currentSetIndex}
+            exerciseIndex={currentExerciseIndex}
+          />
+        );
+      } else {
+        return (
+          <LogVideoFileInput
+            setIndex={currentSetIndex}
+            exerciseIndex={currentExerciseIndex}
+          />
+        );
+      }
     } else {
       return (
         <Button disabled className="my-0 py-1" variant="primary">
@@ -230,6 +247,7 @@ export function GeneratedWorkoutLogTable({
           <th>Weight</th>
           <th>Reps</th>
           <th>Rest Interval (mm : ss)</th>
+          <th>Form video</th>
         </tr>
       </thead>
       <tbody>
