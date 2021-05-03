@@ -87,6 +87,7 @@ export function WorkoutLogsPage() {
         onHide={() => setShow(false)}
         show={show}
         title={modalTitle}
+        body="Any associated form videos will also be deleted. This action is irreversible."
       />
     </Container>
   );

@@ -8,6 +8,7 @@ interface DeleteModalProps {
   title: JSX.Element;
   handleDeleteClick: () => void;
   handleCloseClick: () => void;
+  body?: string;
 }
 export function DeleteModal({
   show,
@@ -15,11 +16,12 @@ export function DeleteModal({
   onHide,
   handleDeleteClick,
   handleCloseClick,
+  body = "This action is irreversible",
 }: DeleteModalProps) {
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>{title}</Modal.Header>
-      <Modal.Body>This action is irreversible.</Modal.Body>
+      <Modal.Body>{body}</Modal.Body>
       <Modal.Footer className="py-1">
         <Button variant="primary" className="py-1" onClick={handleCloseClick}>
           Close
