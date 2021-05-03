@@ -19,8 +19,7 @@ interface workoutLogState {
   data: Array<workoutLogHeaderData>;
   editWorkoutLog: workoutLogData;
   formVideoError?: string;
-  videoUploadInProgress: boolean;
-  currentVideoPlaying?: WorkoutLogPosition;
+  videoUploadProgress: number;
 }
 
 export interface workoutLogHeaderData {
@@ -41,11 +40,13 @@ export interface EntryData {
 
 export interface exerciseLogData {
   name: string;
+  _id?: string;
   exerciseId?: string;
   sets: Array<setLogData>;
 }
 
 export interface setLogData {
+  _id?: string;
   weight: number;
   repetitions: number;
   formVideoName?: string;
@@ -58,9 +59,9 @@ type videoFileExtension = "mp4" | "mkv" | "mov";
 const validVideoFileExtensions: videoFileExtension[] = ["mov", "mp4", "mkv"];
 
 export type WorkoutLogPosition = { setIndex: number; exerciseIndex: number };
-type FileObj = WorkoutLogPosition & { file: File };
+type logVideoFile = WorkoutLogPosition & { file: File };
 
-const logVideoFiles: FileObj[] = [];
+const logVideoFiles: logVideoFile[] = [];
 
 export const addFormVideo = createAsyncThunk(
   "workoutLogs/addFormVideo",
@@ -97,7 +98,7 @@ export const removeFormVideo = createAsyncThunk(
   async (position: WorkoutLogPosition, { dispatch }) => {
     const { setIndex, exerciseIndex } = position;
     const fileToRemoveIndex: number = logVideoFiles.findIndex(
-      (fileObj: FileObj) =>
+      (fileObj: logVideoFile) =>
         fileObj.exerciseIndex === exerciseIndex && fileObj.setIndex === setIndex
     );
     if (fileToRemoveIndex >= 0) {
@@ -116,19 +117,32 @@ export const clearFormVideos = createAsyncThunk(
 
 export const postFormVideos = createAsyncThunk(
   "workoutLogs/postFormVideos",
-  async (id: string) => {
+  async (workoutLog: workoutLogData, { dispatch }) => {
     const logFormData = new FormData();
 
+    // send each video file with name {exerciseId}.{setId}.{fileExtension}
     for (const { file, setIndex, exerciseIndex } of logVideoFiles) {
+      const exerciseId: string | undefined =
+        workoutLog.exercises[exerciseIndex]._id;
+      const setId: string | undefined =
+        workoutLog.exercises[exerciseIndex].sets[setIndex]._id;
       const fileExtension: string = file.name.split(".").pop() as string;
-      const fileName = [exerciseIndex, setIndex, fileExtension].join(".");
+      const fileName = [exerciseId, setId, fileExtension].join(".");
       logFormData.append("formVideos", file, fileName);
     }
 
     try {
       const response: AxiosResponse<any> = await API.post(
-        `${workoutLogUrl}/${id}/videoUpload`,
-        logFormData
+        `${workoutLogUrl}/${workoutLog._id}/videoUpload`,
+        logFormData,
+        {
+          onUploadProgress: (progressEvent) => {
+            const loadedPercentage: number = Math.round(
+              (progressEvent.loaded / progressEvent.total) * 100.0
+            );
+            dispatch(setVideoUploadProgress(loadedPercentage));
+          },
+        }
       );
       return response.data;
     } catch (error) {
@@ -147,7 +161,7 @@ export const postWorkoutLog = createAsyncThunk(
         data
       );
       if (logVideoFiles.length > 0)
-        await dispatch(postFormVideos(response.data._id as string));
+        await dispatch(postFormVideos(response.data));
       return response.data;
     } catch (error) {
       if (error.response) return Promise.reject(error.response.data);
@@ -201,6 +215,32 @@ export const deleteWorkoutLog = createAsyncThunk(
   }
 );
 
+export const deleteSetVideo = createAsyncThunk(
+  "workoutLogs/deleteSetVideo",
+  async ({
+    workoutLogId,
+    exerciseId,
+    setId,
+  }: {
+    workoutLogId: string;
+    exerciseId: string;
+    setId: string;
+  }) => {
+    try {
+      const response: AxiosResponse<{
+        setId: string;
+        exerciseId: string;
+      }> = await API.delete(
+        `${workoutLogUrl}/${workoutLogId}/exercises/${exerciseId}/sets/${setId}`
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
+
 export const resetSuccess = createAsyncThunk(
   "workoutLogs/resetSuccess",
   async (seconds: number, { dispatch }) => {
@@ -213,7 +253,7 @@ export const resetSuccess = createAsyncThunk(
 const initialState: workoutLogState = {
   data: [],
   editWorkoutLog: { exercises: [], createdAt: undefined },
-  videoUploadInProgress: false,
+  videoUploadProgress: 0,
 };
 
 const slice = createSlice({
@@ -269,11 +309,8 @@ const slice = createSlice({
     setFormVideoError(state, action: PayloadAction<string | undefined>) {
       state.formVideoError = action.payload;
     },
-    setCurrentSetVideo(
-      state,
-      action: PayloadAction<WorkoutLogPosition | undefined>
-    ) {
-      state.currentVideoPlaying = action.payload;
+    setVideoUploadProgress(state, action: PayloadAction<number>) {
+      state.videoUploadProgress = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -288,15 +325,12 @@ const slice = createSlice({
       state.editWorkoutLog = { exercises: [] };
       console.error(action.error.message);
     });
-    builder.addCase(postFormVideos.pending, (state, action) => {
-      state.videoUploadInProgress = true;
-    });
     builder.addCase(postFormVideos.rejected, (state, action) => {
-      state.videoUploadInProgress = false;
+      state.videoUploadProgress = 0;
       console.error(action.error.message);
     });
     builder.addCase(postFormVideos.fulfilled, (state, action) => {
-      state.videoUploadInProgress = false;
+      state.videoUploadProgress = 0;
     });
     builder.addCase(
       getWorkoutLogs.fulfilled,
@@ -328,6 +362,21 @@ const slice = createSlice({
       state.error = "Deleting workout failed";
       state.success = undefined;
     });
+    builder.addCase(
+      deleteSetVideo.fulfilled,
+      (state, action: PayloadAction<{ exerciseId: string; setId: string }>) => {
+        const { exerciseId, setId } = action.payload;
+        const set: setLogData | undefined = state.editWorkoutLog.exercises
+          .find((exercise) => exercise._id === exerciseId)
+          ?.sets.find((set) => set._id === setId);
+        if (set) {
+          delete set.formVideo;
+        }
+      }
+    );
+    builder.addCase(deleteSetVideo.rejected, (state, action) => {
+      console.error(action.error.message);
+    });
   },
 });
 
@@ -339,5 +388,5 @@ export const {
   setWorkoutId,
   setFormVideo,
   setFormVideoError,
-  setCurrentSetVideo,
+  setVideoUploadProgress,
 } = slice.actions;
