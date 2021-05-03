@@ -6,13 +6,14 @@ import { WorkoutLogForm } from "../components/WorkoutLogForm";
 import { WorkoutLogTable } from "../containers/WorkoutLogTable";
 import { useAppDispatch, useAppSelector } from "..";
 import {
+  clearEditWorkoutLog,
   clearFormVideos,
   postWorkoutLog,
   setFormVideoError,
 } from "../slices/workoutLogsSlice";
 import { useHistory } from "react-router";
 import { resetSuccess } from "../slices/workoutLogsSlice";
-import { LoadingSpinner } from "../components/LoadingSpinner";
+import { UploadProgressBar } from "../components/UploadProgressBar";
 
 export function NewWorkoutLogPage() {
   const workoutLog = useAppSelector(
@@ -21,26 +22,19 @@ export function NewWorkoutLogPage() {
   const formVideoError: string | undefined = useAppSelector(
     (state) => state.workoutLogs.formVideoError
   );
-  const logCreationPending: boolean = useAppSelector(
-    (state) => state.workoutLogs.logCreationPending
+  const videoUploadProgress: number = useAppSelector(
+    (state) => state.workoutLogs.videoUploadProgress
   );
   const dispatch = useAppDispatch();
   const history = useHistory();
 
   React.useEffect(() => {
     dispatch(clearFormVideos());
+    dispatch(clearEditWorkoutLog());
   }, []);
 
-  if (logCreationPending)
-    return (
-      <>
-        <div className="m-auto">
-          Logging workout... this may take some several minutes. Please do not
-          leave this page.
-        </div>
-        <LoadingSpinner />
-      </>
-    );
+  if (videoUploadProgress)
+    return <UploadProgressBar percentage={videoUploadProgress} />;
 
   async function handleSubmit() {
     if (workoutLog) {
@@ -49,6 +43,7 @@ export function NewWorkoutLogPage() {
       history.push("/logs");
     }
   }
+
   return (
     <Container className="mt-5 d-flex flex-column justify-content-start align-items-center">
       <h3 className="mt-3">New Log</h3>
@@ -64,7 +59,7 @@ export function NewWorkoutLogPage() {
           {formVideoError}
         </Alert>
       ) : null}
-      <WorkoutLogTable />
+      <WorkoutLogTable edit={true} />
       <Button variant="success" onClick={handleSubmit}>
         Log workout
       </Button>
