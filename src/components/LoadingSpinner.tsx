@@ -5,7 +5,8 @@ export function LoadingSpinner() {
   return (
     <Spinner
       animation="border"
-      style={{ position: "fixed", top: "50%", left: "50%" }}
+      className="position-fixed"
+      style={{ top: "50%", left: "50%" }}
     >
       <span className="sr-only">Loading...</span>
     </Spinner>
