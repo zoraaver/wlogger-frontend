@@ -23,7 +23,7 @@ export function WorkoutLogRow({
   const set: setLogData = exercise.sets[setIndex];
 
   function renderVideoCell(): JSX.Element {
-    if (!edit && !set.formVideo) {
+    if (!edit && !set.formVideoExtension) {
       return <>-</>;
     } else if (!edit) {
       return (
