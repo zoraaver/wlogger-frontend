@@ -13,7 +13,7 @@ import {
 } from "../slices/workoutLogsSlice";
 import { useHistory } from "react-router";
 import { resetSuccess } from "../slices/workoutLogsSlice";
-import { UploadProgressBar } from "../components/UploadProgressBar";
+import { UploadProgress } from "../components/UploadProgress";
 
 export function NewWorkoutLogPage() {
   const workoutLog = useAppSelector(
@@ -22,7 +22,7 @@ export function NewWorkoutLogPage() {
   const formVideoError: string | undefined = useAppSelector(
     (state) => state.workoutLogs.formVideoError
   );
-  const videoUploadProgress: number = useAppSelector(
+  const videoUploadProgress = useAppSelector(
     (state) => state.workoutLogs.videoUploadProgress
   );
   const dispatch = useAppDispatch();
@@ -33,8 +33,8 @@ export function NewWorkoutLogPage() {
     dispatch(clearEditWorkoutLog());
   }, []);
 
-  if (videoUploadProgress)
-    return <UploadProgressBar percentage={videoUploadProgress} />;
+  if (Object.keys(videoUploadProgress).length)
+    return <UploadProgress progress={videoUploadProgress} />;
 
   async function handleSubmit() {
     if (workoutLog) {

@@ -7,6 +7,7 @@ import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import {
   clearEditWorkoutLog,
+  clearFormVideos,
   postWorkoutLog,
   resetSuccess,
   setFormVideoError,
@@ -14,7 +15,7 @@ import {
   workoutLogData,
 } from "../slices/workoutLogsSlice";
 import { GeneratedWorkoutLogTable } from "../containers/GeneratedWorkoutLogTable";
-import { UploadProgressBar } from "../components/UploadProgressBar";
+import { UploadProgress } from "../components/UploadProgress";
 
 export function GeneratedWorkoutLogPage() {
   const dispatch = useAppDispatch();
@@ -27,25 +28,27 @@ export function GeneratedWorkoutLogPage() {
   const formVideoError: string | undefined = useAppSelector(
     (state) => state.workoutLogs.formVideoError
   );
-  const videoUploadProgress: number = useAppSelector(
+  const videoUploadProgress = useAppSelector(
     (state) => state.workoutLogs.videoUploadProgress
   );
   const history = useHistory();
-
-  if (!workout) return <Redirect to="/" />;
-
-  React.useEffect(() => {
-    dispatch(clearEditWorkoutLog());
-    dispatch(setWorkoutId(workout._id));
-  }, []);
 
   const [positionInWorkout, setPositionInWorkout] = React.useState({
     setIndex: 0,
     exerciseIndex: 0,
   });
 
-  if (videoUploadProgress)
-    return <UploadProgressBar percentage={videoUploadProgress} />;
+  if (!workout) return <Redirect to="/" />;
+
+  React.useEffect(() => {
+    dispatch(clearEditWorkoutLog());
+    dispatch(clearFormVideos());
+    dispatch(setWorkoutId(workout._id));
+  }, []);
+
+  if (Object.keys(videoUploadProgress).length)
+    return <UploadProgress progress={videoUploadProgress} />;
+
   const workoutFinished: boolean =
     positionInWorkout.exerciseIndex >= workout.exercises.length;
 
