@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { API } from "../config/axios.config";
 import { weightUnit } from "./workoutPlansSlice";
 
@@ -19,7 +19,7 @@ interface workoutLogState {
   data: Array<workoutLogHeaderData>;
   editWorkoutLog: workoutLogData;
   formVideoError?: string;
-  videoUploadProgress: number;
+  videoUploadProgress: { [fileName: string]: number };
 }
 
 export interface workoutLogHeaderData {
@@ -50,9 +50,13 @@ export interface setLogData {
   weight: number;
   repetitions: number;
   formVideoName?: string;
-  formVideo?: { size: number; extension: videoFileExtension };
+  formVideoExtension?: videoFileExtension;
   restInterval?: number;
   unit: weightUnit;
+}
+interface S3SignedPostForm {
+  url: string;
+  fields: { [Key: string]: string };
 }
 
 type videoFileExtension = "mp4" | "mkv" | "mov";
@@ -67,6 +71,7 @@ export const addFormVideo = createAsyncThunk(
   "workoutLogs/addFormVideo",
   async (position: WorkoutLogPosition & { file: File }, { dispatch }) => {
     const megaByte = 1000000;
+    const fileSizeLimit = 50 * megaByte;
     const { file, setIndex, exerciseIndex } = position;
     const fileExtension = file.name.split(".").pop();
     if (
@@ -78,7 +83,7 @@ export const addFormVideo = createAsyncThunk(
           `${fileExtension} is not an allowed file type: Allowed types are 'mov', 'mp4' and 'avi'`
         )
       );
-    } else if (file.size > 50 * megaByte) {
+    } else if (file.size > fileSizeLimit) {
       dispatch(setFormVideoError(`File size cannot exceed 50 MB`));
     } else if (logVideoFiles.length >= 5) {
       dispatch(
@@ -88,7 +93,14 @@ export const addFormVideo = createAsyncThunk(
       );
     } else {
       logVideoFiles.push({ file, setIndex, exerciseIndex });
-      dispatch(setFormVideo({ exerciseIndex, setIndex, fileName: file.name }));
+      dispatch(
+        setFormVideo({
+          exerciseIndex,
+          setIndex,
+          fileName: file.name,
+          fileExtension: fileExtension as videoFileExtension,
+        })
+      );
     }
   }
 );
@@ -117,34 +129,14 @@ export const clearFormVideos = createAsyncThunk(
 
 export const postFormVideos = createAsyncThunk(
   "workoutLogs/postFormVideos",
-  async (workoutLog: workoutLogData, { dispatch }) => {
-    const logFormData = new FormData();
-
-    // send each video file with name {exerciseId}.{setId}.{fileExtension}
-    for (const { file, setIndex, exerciseIndex } of logVideoFiles) {
-      const exerciseId: string | undefined =
-        workoutLog.exercises[exerciseIndex]._id;
-      const setId: string | undefined =
-        workoutLog.exercises[exerciseIndex].sets[setIndex]._id;
-      const fileExtension: string = file.name.split(".").pop() as string;
-      const fileName = [exerciseId, setId, fileExtension].join(".");
-      logFormData.append("formVideos", file, fileName);
-    }
-
+  async (S3UploadForms: S3SignedPostForm[], { dispatch }) => {
+    const requests = constructAndSendS3VideoUploadRequests(
+      S3UploadForms,
+      dispatch
+    );
     try {
-      const response: AxiosResponse<any> = await API.post(
-        `${workoutLogUrl}/${workoutLog._id}/videoUpload`,
-        logFormData,
-        {
-          onUploadProgress: (progressEvent) => {
-            const loadedPercentage: number = Math.round(
-              (progressEvent.loaded / progressEvent.total) * 100.0
-            );
-            dispatch(setVideoUploadProgress(loadedPercentage));
-          },
-        }
-      );
-      return response.data;
+      await axios.all(requests);
+      return;
     } catch (error) {
       if (error.response) return Promise.reject(error.response.data);
       return Promise.reject(error);
@@ -152,16 +144,56 @@ export const postFormVideos = createAsyncThunk(
   }
 );
 
+function constructAndSendS3VideoUploadRequests(
+  S3UploadForms: S3SignedPostForm[],
+  dispatch: any
+): Promise<AxiosResponse<any>>[] {
+  const requests: Promise<AxiosResponse<any>>[] = [];
+  S3UploadForms.forEach((S3Form: S3SignedPostForm, index: number) => {
+    const form: FormData = new FormData();
+    form.append("Content-Type", logVideoFiles[index].file.type);
+    Object.entries(S3Form.fields).forEach(([key, value]) => {
+      form.append(key, value);
+    });
+    form.append("file", logVideoFiles[index].file);
+    requests.push(sendS3VideoUploadRequest(S3Form.url, form, dispatch, index));
+  });
+  return requests;
+}
+
+function sendS3VideoUploadRequest(
+  S3UploadUrl: string,
+  form: FormData,
+  dispatch: any,
+  requestIndex: number
+): Promise<AxiosResponse<any>> {
+  return axios.post(S3UploadUrl, form, {
+    onUploadProgress: (progressEvent) => {
+      const loadedPercentage: number = Math.round(
+        (progressEvent.loaded / progressEvent.total) * 100.0
+      );
+      dispatch(
+        addVideoUploadProgress({
+          fileName:
+            logVideoFiles[requestIndex].file.name +
+            " " +
+            requestIndex.toString(),
+          percentage: loadedPercentage,
+        })
+      );
+    },
+  });
+}
+
 export const postWorkoutLog = createAsyncThunk(
   "workoutLogs/postWorkoutLog",
   async (data: workoutLogData, { dispatch }) => {
     try {
-      const response: AxiosResponse<workoutLogData> = await API.post(
-        workoutLogUrl,
-        data
-      );
+      const response: AxiosResponse<
+        workoutLogData & { uploadUrls: S3SignedPostForm[] }
+      > = await API.post(workoutLogUrl, data);
       if (logVideoFiles.length > 0)
-        await dispatch(postFormVideos(response.data));
+        await dispatch(postFormVideos(response.data.uploadUrls));
       return response.data;
     } catch (error) {
       if (error.response) return Promise.reject(error.response.data);
@@ -253,7 +285,7 @@ export const resetSuccess = createAsyncThunk(
 const initialState: workoutLogState = {
   data: [],
   editWorkoutLog: { exercises: [], createdAt: undefined },
-  videoUploadProgress: 0,
+  videoUploadProgress: {},
 };
 
 const slice = createSlice({
@@ -298,19 +330,33 @@ const slice = createSlice({
     },
     setFormVideo(
       state,
-      action: PayloadAction<WorkoutLogPosition & { fileName?: string }>
+      action: PayloadAction<
+        WorkoutLogPosition & {
+          fileName?: string;
+          fileExtension?: videoFileExtension;
+        }
+      >
     ) {
-      const { setIndex, exerciseIndex, fileName } = action.payload;
+      const {
+        setIndex,
+        exerciseIndex,
+        fileName,
+        fileExtension,
+      } = action.payload;
       state.formVideoError = undefined;
-      state.editWorkoutLog.exercises[exerciseIndex].sets[
-        setIndex
-      ].formVideoName = fileName;
+      const set = state.editWorkoutLog.exercises[exerciseIndex].sets[setIndex];
+      set.formVideoName = fileName;
+      set.formVideoExtension = fileExtension;
     },
     setFormVideoError(state, action: PayloadAction<string | undefined>) {
       state.formVideoError = action.payload;
     },
-    setVideoUploadProgress(state, action: PayloadAction<number>) {
-      state.videoUploadProgress = action.payload;
+    addVideoUploadProgress(
+      state,
+      action: PayloadAction<{ fileName: string; percentage: number }>
+    ) {
+      const { fileName, percentage } = action.payload;
+      state.videoUploadProgress[fileName] = percentage;
     },
   },
   extraReducers: (builder) => {
@@ -326,11 +372,11 @@ const slice = createSlice({
       console.error(action.error.message);
     });
     builder.addCase(postFormVideos.rejected, (state, action) => {
-      state.videoUploadProgress = 0;
+      state.videoUploadProgress = {};
       console.error(action.error.message);
     });
     builder.addCase(postFormVideos.fulfilled, (state, action) => {
-      state.videoUploadProgress = 0;
+      state.videoUploadProgress = {};
     });
     builder.addCase(
       getWorkoutLogs.fulfilled,
@@ -370,7 +416,7 @@ const slice = createSlice({
           .find((exercise) => exercise._id === exerciseId)
           ?.sets.find((set) => set._id === setId);
         if (set) {
-          delete set.formVideo;
+          delete set.formVideoExtension;
         }
       }
     );
@@ -388,5 +434,5 @@ export const {
   setWorkoutId,
   setFormVideo,
   setFormVideoError,
-  setVideoUploadProgress,
+  addVideoUploadProgress,
 } = slice.actions;
