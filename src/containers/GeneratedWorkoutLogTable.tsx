@@ -247,7 +247,7 @@ export function GeneratedWorkoutLogTable({
           <th>Weight</th>
           <th>Reps</th>
           <th>Rest Interval (mm : ss)</th>
-          <th>Form video</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
