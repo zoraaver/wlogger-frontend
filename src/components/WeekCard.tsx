@@ -3,10 +3,11 @@ import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { deleteWeek, weekData } from "../slices/workoutPlansSlice";
-import { useHistory, useParams } from "react-router";
+import { useParams } from "react-router";
 import { Pencil, Trash } from "react-bootstrap-icons";
 import { WorkoutTable } from "../containers/WorkoutTable";
 import { useAppDispatch } from "..";
+import { Link } from "react-router-dom";
 
 interface WeekCardProps {
   weekData: weekData;
@@ -15,7 +16,6 @@ interface WeekCardProps {
 export function WeekCard({
   weekData: { repeat, position, workouts },
 }: WeekCardProps) {
-  const history = useHistory();
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
 
@@ -34,7 +34,7 @@ export function WeekCard({
   return (
     <Accordion className="w-75 mt-1">
       <Card>
-        <Card.Header className="w-100 d-flex flex-row justify-content-end">
+        <Card.Header className="w-100 d-flex flex-row justify-content-end align-items-center">
           <Accordion.Toggle
             className="mr-auto"
             as={Button}
@@ -44,15 +44,12 @@ export function WeekCard({
             <h6 className="d-inline font-weight-bold">{renderTitle()}</h6>{" "}
             {workouts.length} workout{workouts.length !== 1 ? "s" : ""}
           </Accordion.Toggle>
-          <Button
-            className="mx-2"
-            variant="link"
-            onClick={() =>
-              history.push(`/plans/${id ? id : "new"}/weeks/${position}`)
-            }
+          <Link
+            className="mr-3"
+            to={`/plans/${id ? id : "new"}/weeks/${position}`}
           >
             <Pencil />
-          </Button>
+          </Link>
           <Button variant="danger" onClick={handleDeleteClick}>
             <Trash />
           </Button>

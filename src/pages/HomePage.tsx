@@ -1,18 +1,16 @@
 import * as React from "react";
 import Container from "react-bootstrap/Container";
-import Button from "react-bootstrap/Button";
 import { useAppDispatch, useAppSelector } from "..";
 import { getNextWorkout, workoutData } from "../slices/workoutsSlice";
 import { ExerciseTable } from "../containers/ExerciseTable";
 import { isToday, isTomorrow } from "../util/util";
 import { Card } from "react-bootstrap";
-import { useHistory } from "react-router";
 import { getCurrentPlan } from "../slices/workoutPlansSlice";
 import { WorkoutPlanCard } from "../components/WorkoutPlanCard";
+import { Link } from "react-router-dom";
 
 export function HomePage() {
   const dispatch = useAppDispatch();
-  const history = useHistory();
   const nextWorkout: workoutData | undefined = useAppSelector(
     (state) => state.workouts.nextWorkout
   );
@@ -54,13 +52,13 @@ export function HomePage() {
     } else {
       return (
         <Card.Body className="d-flex flex-row justify-content-around align-items-center">
-          <Button variant="success" onClick={() => history.push("/plans")}>
+          <Link className="btn btn-success" to="/plans">
             Start a new plan
-          </Button>
+          </Link>
           or
-          <Button variant="success" onClick={() => history.push("/logs/new")}>
+          <Link className="btn btn-success" to="/logs/new">
             Log a workout
-          </Button>
+          </Link>
         </Card.Body>
       );
     }
@@ -71,18 +69,15 @@ export function HomePage() {
     const workoutDate: Date = new Date(nextWorkout.date as string);
     if (isToday(workoutDate)) {
       return (
-        <Button
-          variant="success"
-          onClick={() => history.push("/workout/logs/new")}
-        >
+        <Link className="btn btn-success" to="/workout/logs/new">
           Begin workout
-        </Button>
+        </Link>
       );
     } else {
       return (
-        <Button variant="success" onClick={() => history.push("/logs/new")}>
+        <Link className="btn btn-success" to="/logs/new">
           Log a separate workout
-        </Button>
+        </Link>
       );
     }
     return;

@@ -1,13 +1,13 @@
 import * as React from "react";
 import Container from "react-bootstrap/Container";
-import Button from "react-bootstrap/Button";
-import { useHistory, useParams } from "react-router";
+import { useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "..";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { WorkoutLogTable } from "../containers/WorkoutLogTable";
 import { getWorkoutLog, workoutLogData } from "../slices/workoutLogsSlice";
 import { ArrowLeft } from "react-bootstrap-icons";
 import { VideoModal } from "../components/VideoModal";
+import { Link } from "react-router-dom";
 
 export function WorkoutLogPage() {
   const dispatch = useAppDispatch();
@@ -15,7 +15,6 @@ export function WorkoutLogPage() {
   const workoutLog: workoutLogData | undefined = useAppSelector(
     (state) => state.workoutLogs.editWorkoutLog
   );
-  const history = useHistory();
 
   React.useEffect(() => {
     if (workoutLog._id !== id) dispatch(getWorkoutLog(id));
@@ -29,14 +28,10 @@ export function WorkoutLogPage() {
   return (
     <Container className="mt-5 d-flex flex-column justify-content-start align-items-center">
       <h3 className="mt-3">{workoutLogDate.toDateString()}</h3>
-      <Button
-        variant="link"
-        onClick={() => history.push("/logs")}
-        className="mr-auto"
-      >
+      <Link to="/logs" className="mr-auto">
         <ArrowLeft className="mr-1" />
         Back to Logs
-      </Button>
+      </Link>
       <WorkoutLogTable edit={false} />
       <VideoModal />
     </Container>

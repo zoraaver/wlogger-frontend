@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Bootstrap from "react-bootstrap";
 import Nav from "react-bootstrap/Nav";
 import { useAppDispatch, useAppSelector } from "..";
-import { useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { logoutUser } from "../slices/usersSlice";
 import { LayoutSidebar } from "react-bootstrap-icons";
 import { toggleSidebar } from "../slices/UISlice";
@@ -13,7 +13,6 @@ export function Navbar() {
     (state) => state.user.authenticationStatus
   );
   const authenticated = authenticationStatus === "confirmed";
-  const history = useHistory();
 
   function logout() {
     dispatch(logoutUser());
@@ -36,11 +35,14 @@ export function Navbar() {
       <Bootstrap.Navbar.Toggle aria-controls="basic-navbar-nav" />
       {authenticated ? (
         <Nav>
-          <Nav.Link onClick={() => history.push("/")}>Home</Nav.Link>
-          <Nav.Link onClick={() => history.push("/logs")}>Logs</Nav.Link>
+          <Link className="btn nav-link" to="/">
+            Home
+          </Link>
+          <Link to="/logs" className="btn nav-link">
+            Logs
+          </Link>
         </Nav>
       ) : null}
-      {/* {onNewWorkoutLogPage ? <Timer title="Workout time" /> : null} */}
       {authenticated ? (
         <Nav className="ml-auto">
           <Nav.Link onClick={logout} as="button" className="btn">

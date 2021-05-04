@@ -1,44 +1,26 @@
 import * as React from "react";
 import { useAppSelector } from "../..";
-import Nav from "react-bootstrap/Nav";
 import "./Sidebar.css";
-import { useHistory } from "react-router";
 import Fade from "react-bootstrap/Fade";
+import { Link } from "react-router-dom";
 
 export function Sidebar() {
   const sidebarOpen: boolean = useAppSelector((state) => state.UI.sidebarOpen);
-  const history = useHistory();
   return (
     <Fade in={sidebarOpen} unmountOnExit={true}>
       <div className="sidenav">
-        <Nav.Link
-          as="button"
-          className="btn"
-          onClick={() => history.push("/plans/new")}
-        >
+        <Link className="btn nav-link" to="/plans/new">
           Create a new plan
-        </Nav.Link>
-        <Nav.Link
-          as="button"
-          className="btn"
-          onClick={() => history.push("/plans")}
-        >
+        </Link>
+        <Link className="btn nav-link" to="/plans">
           Manage my plans
-        </Nav.Link>
-        <Nav.Link
-          as="button"
-          className="btn"
-          onClick={() => history.push("/statistics")}
-        >
+        </Link>
+        <Link className="btn nav-link" to="/statistics">
           Statistics
-        </Nav.Link>
-        <Nav.Link
-          as="button"
-          className="btn"
-          onClick={() => history.push("/exercises")}
-        >
+        </Link>
+        <Link className="btn nav-link" to="/exercises">
           Exercises
-        </Nav.Link>
+        </Link>
       </div>
     </Fade>
   );

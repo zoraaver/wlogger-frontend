@@ -3,7 +3,7 @@ import { Pencil, Trash } from "react-bootstrap-icons";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { workoutPlanHeaderData } from "../slices/workoutPlansSlice";
-import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 
 interface WorkoutPlanCardProps {
   workoutPlan: workoutPlanHeaderData;
@@ -20,7 +20,6 @@ export function WorkoutPlanCard({
   showDelete,
   width = 50,
 }: WorkoutPlanCardProps) {
-  const history = useHistory();
   const { name, length, status, _id, start, end } = workoutPlan;
   const widthString: string = `w-${width}`;
 
@@ -54,13 +53,9 @@ export function WorkoutPlanCard({
     <Card className={widthString + " mt-4"}>
       <Card.Header className="d-flex flex-row justify-content-end align-items-center">
         <Card.Title className="mb-0 mr-auto">{name}</Card.Title>
-        <Button
-          onClick={() => history.push(`/plans/${_id}/weeks`)}
-          variant="link"
-          className="mb-0 d-inline-block"
-        >
+        <Link to={`/plans/${_id}/weeks`} className="mr-2">
           <Pencil />
-        </Button>
+        </Link>
         {showDelete && handleShowDeleteModal ? (
           <Button
             onClick={() => handleShowDeleteModal(_id, name)}
