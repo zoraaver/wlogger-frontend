@@ -12,6 +12,14 @@ const webpackProdConfig = {
           from: path.resolve(__dirname, "public", "_redirects"),
           to: path.resolve(__dirname, "build"),
         },
+        {
+          from: path.resolve(
+            __dirname,
+            "public",
+            "googlef78e7f6e1c652c24.html"
+          ),
+          to: path.resolve(__dirname, "build"),
+        },
       ],
       options: {
         concurrency: 100,
