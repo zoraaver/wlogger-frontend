@@ -304,8 +304,13 @@ const slice = createSlice({
       const exercises = state.editWorkoutLog.exercises;
       const lastLoggedExercise =
         exercises.length > 0 ? exercises[exercises.length - 1] : undefined;
-      if (lastLoggedExercise && lastLoggedExercise.name === name) {
-        lastLoggedExercise.sets.push({
+      const exercisesMatch: boolean | undefined =
+        lastLoggedExercise &&
+        (exerciseId !== undefined
+          ? lastLoggedExercise.exerciseId === exerciseId
+          : lastLoggedExercise.name == name);
+      if (exercisesMatch) {
+        lastLoggedExercise!.sets.push({
           weight,
           unit,
           repetitions,
