@@ -1,6 +1,10 @@
 import axios from "axios";
 
-export const baseURL = "http://localhost:8080";
+const backendUrl: string = "https://wlogger-api.herokuapp.com";
+const developmentUrl: string = "http://localhost:8080";
+
+export const baseURL =
+  process.env.NODE_ENV === "production" ? backendUrl : developmentUrl;
 
 export const API = axios.create({ baseURL });
 
