@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
+const { EnvironmentPlugin } = require("webpack");
 
 exports.webpackCommonConfig = {
   entry: "./src/index.tsx",
@@ -13,6 +14,7 @@ exports.webpackCommonConfig = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "public", "index.html"),
     }),
+    new EnvironmentPlugin({ NODE_ENV: "development" }),
   ],
   resolve: {
     modules: [__dirname, "src", "node_modules"],

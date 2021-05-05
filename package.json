@@ -5,7 +5,7 @@
   "main": "public/index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config ./webpack.prod.js",
+    "build": "NODE_ENV=production webpack --config ./webpack.prod.js",
     "start": "npx webpack serve --config ./webpack.dev.js"
   },
   "repository": {
