@@ -16,10 +16,8 @@ export function WorkoutLogForm() {
     unit: "kg",
   });
   const [error, setError] = React.useState("");
-  const [
-    timeElapsedSinceEntryAdded,
-    setTimeElapsedSinceEntryAdded,
-  ] = React.useState(0);
+  const [timeElapsedSinceEntryAdded, setTimeElapsedSinceEntryAdded] =
+    React.useState(0);
   const [setInProgress, setSetInProgress] = React.useState(false);
   const dispatch = useAppDispatch();
 
@@ -93,13 +91,13 @@ export function WorkoutLogForm() {
     <Form onSubmit={handleSubmit} className="w-75 mt-3">
       <Form.Row>
         <Col>
-          <Form.Label>Name</Form.Label>
+          <Form.Label>Exercise</Form.Label>
           <Form.Control
             name="name"
             value={formData.name}
             onChange={handleChange}
             type="text"
-            placeholder="name"
+            placeholder="exercise name"
           />
         </Col>
         <Col>
