@@ -353,7 +353,11 @@ const slice = createSlice({
       const { fileName, percentage } = action.payload;
       state.videoUploadProgress[fileName] = percentage;
     },
-    setLogDate(state, action: PayloadAction<string>) {
+    setLogDate(state, action: PayloadAction<string | undefined>) {
+      if (action.payload === undefined) {
+        state.editWorkoutLog.createdAt = undefined;
+        return;
+      }
       const newDate = new Date(action.payload);
       if (newDate.getTime() !== NaN)
         state.editWorkoutLog.createdAt = action.payload;

@@ -120,10 +120,15 @@ export function WorkoutLogForm() {
   }
 
   function handleDateChange({ target }: React.ChangeEvent<HTMLInputElement>) {
-    if (!isToday(target.value) && restIntervalTimer) {
+    const newDateIsToday: boolean = isToday(target.value);
+    if (!newDateIsToday && restIntervalTimer) {
       setRestIntervalTimer(!restIntervalTimer);
     }
-    dispatch(setLogDate(target.value));
+    if (newDateIsToday) {
+      dispatch(setLogDate(undefined));
+    } else {
+      dispatch(setLogDate(target.value));
+    }
   }
 
   function handleResetTimer() {
