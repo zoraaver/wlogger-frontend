@@ -11,6 +11,7 @@ export interface workoutLogData {
   updatedAt?: string;
   _id?: string;
   workoutId?: string;
+  notes?: string;
 }
 
 interface workoutLogState {
@@ -362,6 +363,12 @@ const slice = createSlice({
       if (newDate.getTime() !== NaN)
         state.editWorkoutLog.createdAt = action.payload;
     },
+    setLogNotes(state, action: PayloadAction<string>) {
+      console.log(action.payload.length);
+      if (action.payload.length < 1000) {
+        state.editWorkoutLog.notes = action.payload;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(
@@ -440,4 +447,5 @@ export const {
   setFormVideoError,
   addVideoUploadProgress,
   setLogDate,
+  setLogNotes,
 } = slice.actions;
