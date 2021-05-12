@@ -2,10 +2,10 @@ import * as React from "react";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
-import { useAppDispatch } from "..";
-import { addSet, EntryData } from "../slices/workoutLogsSlice";
+import { useAppDispatch, useAppSelector } from "..";
+import { addSet, EntryData, setLogDate } from "../slices/workoutLogsSlice";
 import { weightUnit } from "../slices/workoutPlansSlice";
-import { renderRestInterval } from "../util/util";
+import { isToday, renderRestInterval } from "../util/util";
 
 export function WorkoutLogForm() {
   const [formData, setFormData] = React.useState<EntryData>({
@@ -20,20 +20,27 @@ export function WorkoutLogForm() {
     React.useState(0);
   const [setInProgress, setSetInProgress] = React.useState(false);
   const dispatch = useAppDispatch();
+  const logDateString = useAppSelector(
+    (state) => state.workoutLogs.editWorkoutLog.createdAt
+  );
+  const [restIntervalTimer, setRestIntervalTimer] = React.useState(false);
+
+  const maxDate: string = new Date(Date.now()).toISOString().split("T")[0];
+  const logDate: string = logDateString || maxDate;
 
   React.useEffect(() => {
     let timer: NodeJS.Timeout;
     if (!setInProgress) {
-      timer = setTimeout(() => {
+      timer = setInterval(() => {
         setTimeElapsedSinceEntryAdded(Date.now() - formData.restInterval);
       }, 1000);
     } else {
       setTimeElapsedSinceEntryAdded(formData.restInterval * 1000);
     }
     return () => {
-      clearTimeout(timer);
+      clearInterval(timer);
     };
-  }, [timeElapsedSinceEntryAdded, setInProgress]);
+  }, [setInProgress, formData.restInterval]);
 
   function handleChange({ target }: React.ChangeEvent<HTMLInputElement>) {
     const numberValue = Number(target.value);
@@ -74,10 +81,14 @@ export function WorkoutLogForm() {
     if (formData.repetitions === ("" as any)) formData.repetitions = 0;
     if (formData.weight === ("" as any)) formData.weight = 0;
 
-    if (setInProgress) {
+    if (setInProgress || !restIntervalTimer) {
       setSetInProgress(false);
       setError("");
-      dispatch(addSet(formData));
+      // set restInterval to 0 if timer is not enabled
+      const restInterval: number = restIntervalTimer
+        ? formData.restInterval
+        : 0;
+      dispatch(addSet({ ...formData, restInterval }));
       // reset time for new set
       formData.restInterval = Date.now();
     } else {
@@ -87,8 +98,63 @@ export function WorkoutLogForm() {
     }
   }
 
+  function renderSetButton() {
+    if (restIntervalTimer) {
+      return (
+        <Button variant={setInProgress ? "danger" : "success"} type="submit">
+          {setInProgress ? "End set" : "Begin set"}
+        </Button>
+      );
+    } else {
+      return (
+        <Button variant="success" type="submit">
+          Add set
+        </Button>
+      );
+    }
+  }
+
+  function handleRestIntervalTimerChange() {
+    if (!isToday(logDate) || setInProgress) return;
+    setRestIntervalTimer(!restIntervalTimer);
+  }
+
+  function handleDateChange({ target }: React.ChangeEvent<HTMLInputElement>) {
+    if (!isToday(target.value) && restIntervalTimer) {
+      setRestIntervalTimer(!restIntervalTimer);
+    }
+    dispatch(setLogDate(target.value));
+  }
+
+  function handleResetTimer() {
+    if (setInProgress) return;
+    setFormData({ ...formData, restInterval: Date.now() });
+  }
+
   return (
     <Form onSubmit={handleSubmit} className="w-75 mt-3">
+      <Form.Row className="mb-5">
+        <Form.Label column sm="2" className="mr-0">
+          Log date:
+        </Form.Label>
+        <Col sm="3" className="mr-3">
+          <Form.Control
+            type="date"
+            max={maxDate}
+            value={logDate}
+            onChange={handleDateChange}
+            readOnly={setInProgress}
+          />
+        </Col>
+        <Col sm="4" className="d-flex align-items-center">
+          <Form.Check
+            label="Rest interval timer"
+            checked={restIntervalTimer}
+            disabled={!isToday(logDate) || setInProgress}
+            onChange={handleRestIntervalTimerChange}
+          />
+        </Col>
+      </Form.Row>
       <Form.Row>
         <Col>
           <Form.Label>Exercise</Form.Label>
@@ -132,20 +198,27 @@ export function WorkoutLogForm() {
             <option value="lb">lb</option>
           </Form.Control>
         </Col>
-        <Col>
-          <Form.Label>Rest Interval</Form.Label>
-          <Form.Control
-            readOnly
-            value={renderRestInterval(timeElapsedSinceEntryAdded / 1000)}
-          />
-        </Col>
+        {restIntervalTimer ? (
+          <>
+            <Col>
+              <Form.Label>Rest Interval</Form.Label>
+              <Form.Control
+                readOnly
+                value={renderRestInterval(timeElapsedSinceEntryAdded / 1000)}
+              />
+            </Col>
+            <Col className="d-flex flex-column justify-content-end align-items-center">
+              <Button disabled={setInProgress} onClick={handleResetTimer}>
+                Reset timer
+              </Button>
+            </Col>
+          </>
+        ) : null}
         <Col
           className="d-flex flex-column justify-content-end align-items-center"
           lg={50}
         >
-          <Button variant={setInProgress ? "danger" : "success"} type="submit">
-            {setInProgress ? "End set" : "Begin set"}
-          </Button>
+          {renderSetButton()}
         </Col>
       </Form.Row>
       {error ? (
