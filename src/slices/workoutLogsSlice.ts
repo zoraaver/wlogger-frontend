@@ -293,14 +293,8 @@ const slice = createSlice({
   initialState,
   reducers: {
     addSet(state, action: PayloadAction<EntryData>) {
-      const {
-        name,
-        repetitions,
-        weight,
-        unit,
-        restInterval,
-        exerciseId,
-      } = action.payload;
+      const { name, repetitions, weight, unit, restInterval, exerciseId } =
+        action.payload;
       const exercises = state.editWorkoutLog.exercises;
       const lastLoggedExercise =
         exercises.length > 0 ? exercises[exercises.length - 1] : undefined;
@@ -342,12 +336,8 @@ const slice = createSlice({
         }
       >
     ) {
-      const {
-        setIndex,
-        exerciseIndex,
-        fileName,
-        fileExtension,
-      } = action.payload;
+      const { setIndex, exerciseIndex, fileName, fileExtension } =
+        action.payload;
       state.formVideoError = undefined;
       const set = state.editWorkoutLog.exercises[exerciseIndex].sets[setIndex];
       set.formVideoName = fileName;
@@ -362,6 +352,11 @@ const slice = createSlice({
     ) {
       const { fileName, percentage } = action.payload;
       state.videoUploadProgress[fileName] = percentage;
+    },
+    setLogDate(state, action: PayloadAction<string>) {
+      const newDate = new Date(action.payload);
+      if (newDate.getTime() !== NaN)
+        state.editWorkoutLog.createdAt = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -440,4 +435,5 @@ export const {
   setFormVideo,
   setFormVideoError,
   addVideoUploadProgress,
+  setLogDate,
 } = slice.actions;
