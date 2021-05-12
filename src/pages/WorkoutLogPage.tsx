@@ -33,6 +33,12 @@ export function WorkoutLogPage() {
         Back to Logs
       </Link>
       <WorkoutLogTable edit={false} />
+      {workoutLog.notes ? (
+        <Container className="w-75">
+          <b>Notes</b>:{" "}
+          <p style={{ wordBreak: "break-word" }}>{workoutLog.notes}</p>
+        </Container>
+      ) : null}
       <VideoModal />
     </Container>
   );
