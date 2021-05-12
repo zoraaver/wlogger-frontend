@@ -7,7 +7,7 @@ import {
 import { incrementField } from "../slices/workoutsSlice";
 
 export function renderRestInterval(seconds?: number) {
-  if (seconds === undefined) return "-";
+  if (!seconds) return "-";
   seconds = Math.round(seconds);
   const minutes = Math.floor(seconds / 60);
   seconds = seconds % 60;
@@ -27,13 +27,23 @@ export function calculateLength(
   return lastWeek.repeat + lastWeek.position;
 }
 
-export function isToday(date: Date): boolean {
+export function isToday(date: Date | string): boolean {
   const today: Date = new Date(Date.now());
-  return (
-    date.getFullYear() === today.getFullYear() &&
-    date.getMonth() === today.getMonth() &&
-    date.getDate() === today.getDate()
-  );
+  if (typeof date === "string") {
+    const dateToCompare: Date = new Date(date);
+    if (dateToCompare.getTime() === NaN) return false;
+    return (
+      dateToCompare.getFullYear() === today.getFullYear() &&
+      dateToCompare.getMonth() === today.getMonth() &&
+      dateToCompare.getDate() === today.getDate()
+    );
+  } else {
+    return (
+      date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth() &&
+      date.getDate() === today.getDate()
+    );
+  }
 }
 
 export function isTomorrow(date: Date): boolean {
