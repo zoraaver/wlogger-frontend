@@ -10,10 +10,12 @@ import {
   clearFormVideos,
   postWorkoutLog,
   setFormVideoError,
+  setLogNotes,
 } from "../slices/workoutLogsSlice";
 import { useHistory } from "react-router";
 import { resetSuccess } from "../slices/workoutLogsSlice";
 import { UploadProgress } from "../components/UploadProgress";
+import { Form } from "react-bootstrap";
 
 export function NewWorkoutLogPage() {
   const workoutLog = useAppSelector(
@@ -59,7 +61,17 @@ export function NewWorkoutLogPage() {
           {formVideoError}
         </Alert>
       ) : null}
+      <h4 className="mt-4">Logged sets:</h4>
       <WorkoutLogTable edit={true} />
+      <Form className="w-75 mb-3">
+        <Form.Label>Notes:</Form.Label>
+        <Form.Control
+          as="textarea"
+          placeholder="Max 1000 characters"
+          value={workoutLog.notes || ""}
+          onChange={({ target }) => dispatch(setLogNotes(target.value))}
+        />
+      </Form>
       <Button variant="success" onClick={handleSubmit}>
         Log workout
       </Button>
