@@ -46,7 +46,7 @@ export function NewWorkoutLogPage() {
 
   return (
     <Container className="mt-5 d-flex flex-column justify-content-start align-items-center">
-      <h3 className="mt-3">New Log</h3>
+      <h2 className="my-3">New Log</h2>
       <WorkoutLogForm />
       {formVideoError ? (
         <Alert
