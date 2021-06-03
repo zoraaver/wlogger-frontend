@@ -1,0 +1,17 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "GB64J83NZ6.org.zoraaver.wLogger"
+        ],
+        "components": [
+          {
+            "/": "/verify/*",
+            "comment": "Verify user's emails addresses in app"
+          }
+        ]
+      }
+    ]
+  }
+}
