@@ -20,6 +20,10 @@ const webpackProdConfig = {
           ),
           to: path.resolve(__dirname, "build"),
         },
+        {
+          from: path.resolve(__dirname, "public", "apple-app-site-association"),
+          to: path.resolve(__dirname, "build", ".well-known"),
+        },
       ],
       options: {
         concurrency: 100,
