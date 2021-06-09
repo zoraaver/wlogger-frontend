@@ -9,20 +9,9 @@ const webpackProdConfig = {
     new CopyPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, "public", "_redirects"),
+          from: path.resolve(__dirname, "public"),
           to: path.resolve(__dirname, "build"),
-        },
-        {
-          from: path.resolve(
-            __dirname,
-            "public",
-            "googlef78e7f6e1c652c24.html"
-          ),
-          to: path.resolve(__dirname, "build"),
-        },
-        {
-          from: path.resolve(__dirname, "public", "apple-app-site-association"),
-          to: path.resolve(__dirname, "build", ".well-known"),
+          globOptions: { ignore: "**/index.html" },
         },
       ],
       options: {
