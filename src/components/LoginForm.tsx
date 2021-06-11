@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "../index";
 import { loginUser } from "../slices/usersSlice";
 import { SignupModal } from "./SignupModal";
 import { VerticalDivider } from "./VerticalDivider";
+import { AppleButton } from "./AppleButton";
 
 export function LoginForm() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -72,6 +73,7 @@ export function LoginForm() {
             <VerticalDivider text="or" thickness={4} />
             <Col className="d-flex flex-column justify-content-center">
               <GoogleButton text="Sign in with Google" width={240} />
+              <AppleButton width={240} />
             </Col>
           </Row>
         </Form>
