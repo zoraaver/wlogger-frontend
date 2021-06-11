@@ -38,6 +38,8 @@ function handleAppleResponse(response: AppleResponse, dispatch: AppDispatch) {
         OAuthProvider: "apple",
       })
     );
+  } else {
+    console.log(response);
   }
 }
 
