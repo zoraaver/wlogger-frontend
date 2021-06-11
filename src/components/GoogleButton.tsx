@@ -6,7 +6,10 @@ import {
   GoogleLoginResponseOffline,
 } from "react-google-login";
 import { useAppDispatch } from "..";
-import { googleLoginUser } from "../slices/usersSlice";
+import { OAuthLoginUser } from "../slices/usersSlice";
+
+// @ts-ignore
+import GoogleLogo from "../assets/google_logo.png";
 
 interface GoogleButtonProps {
   text: string;
@@ -19,8 +22,9 @@ export function GoogleButton({ text, width }: GoogleButtonProps) {
   function responseGoogle(
     response: GoogleLoginResponse | GoogleLoginResponseOffline
   ): void {
-    if ((response as GoogleLoginResponse).tokenId) {
-      dispatch(googleLoginUser((response as GoogleLoginResponse).tokenId));
+    const idToken = (response as GoogleLoginResponse).tokenId;
+    if (idToken) {
+      dispatch(OAuthLoginUser({ OAuthProvider: "google", idToken }));
     } else {
       console.log(response.code);
     }
@@ -28,8 +32,6 @@ export function GoogleButton({ text, width }: GoogleButtonProps) {
 
   const GOOGLE_CLIENT_ID: string =
     "695443910196-mc7763ul6h5k5kgf1p08hjfn2pv7kccs.apps.googleusercontent.com";
-  const googleImageSrc =
-    "https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg";
   const googleJsSrc = "https://apis.google.com/js/platform.js";
 
   return (
@@ -48,7 +50,7 @@ export function GoogleButton({ text, width }: GoogleButtonProps) {
           disabled={renderProps.disabled}
         >
           <Image
-            src={googleImageSrc}
+            src={GoogleLogo}
             rounded
             style={{
               backgroundColor: "white",
