@@ -4,6 +4,7 @@ import { API } from "../config/axios.config";
 
 const loginUrl = "/auth/login";
 const googleLoginUrl = "/auth/google";
+const appleLoginUrl = "/auth/apple";
 const validateUrl = "/auth/validate";
 const verifyUrl = "/auth/verify";
 const logoutUrl = "/auth/logout";
@@ -38,13 +39,24 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-export const googleLoginUser = createAsyncThunk(
-  "users/googleLoginUser",
-  async (idToken: string) => {
+const OAuthProviderLoginUrlMap = {
+  apple: appleLoginUrl,
+  google: googleLoginUrl,
+} as const;
+
+interface OAuthLoginUserArg {
+  idToken: string;
+  OAuthProvider: keyof typeof OAuthProviderLoginUrlMap;
+}
+
+export const OAuthLoginUser = createAsyncThunk(
+  "users/OAuthLoginUser",
+  async ({ idToken, OAuthProvider }: OAuthLoginUserArg) => {
+    const OAuthLoginUrl = OAuthProviderLoginUrlMap[OAuthProvider];
     try {
       const response: AxiosResponse<{
         user: userData;
-      }> = await API.post(googleLoginUrl, { idToken });
+      }> = await API.post(OAuthLoginUrl, { idToken });
       return response.data.user;
     } catch (error) {
       if (error.response) return Promise.reject(error.response.data);
@@ -144,14 +156,26 @@ const slice = createSlice({
       state.authenticationStatus = action.payload;
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(loginUser.rejected, (state, action) => {
+  extraReducers: ({ addCase }) => {
+    addCase(loginUser.rejected, (state, action) => {
       state.data = null;
       state.loginError = action.error.message;
       state.authenticationStatus = "unknown";
     });
-    builder.addCase(
-      loginUser.fulfilled,
+
+    addCase(loginUser.fulfilled, (state, action: PayloadAction<userData>) => {
+      const userData = action.payload;
+      state.data = userData;
+      state.loginError = undefined;
+      state.authenticationStatus = "confirmed";
+    });
+
+    addCase(loginUser.pending, (state) => {
+      state.authenticationStatus = "pending";
+    });
+
+    addCase(
+      OAuthLoginUser.fulfilled,
       (state, action: PayloadAction<userData>) => {
         const userData = action.payload;
         state.data = userData;
@@ -159,27 +183,18 @@ const slice = createSlice({
         state.authenticationStatus = "confirmed";
       }
     );
-    builder.addCase(loginUser.pending, (state, action) => {
-      state.authenticationStatus = "pending";
-    });
-    builder.addCase(
-      googleLoginUser.fulfilled,
-      (state, action: PayloadAction<userData>) => {
-        const userData = action.payload;
-        state.data = userData;
-        state.loginError = undefined;
-        state.authenticationStatus = "confirmed";
-      }
-    );
-    builder.addCase(googleLoginUser.rejected, (state, action) => {
+
+    addCase(OAuthLoginUser.rejected, (state, action) => {
       state.data = null;
       state.loginError = action.error.message;
       state.authenticationStatus = "unknown";
     });
-    builder.addCase(googleLoginUser.pending, (state, action) => {
+
+    addCase(OAuthLoginUser.pending, (state) => {
       state.authenticationStatus = "pending";
     });
-    builder.addCase(
+
+    addCase(
       validateUser.fulfilled,
       (state, action: PayloadAction<userData>) => {
         const userData = action.payload;
@@ -187,52 +202,48 @@ const slice = createSlice({
         state.authenticationStatus = "confirmed";
       }
     );
-    builder.addCase(validateUser.pending, (state, action) => {
+
+    addCase(validateUser.pending, (state) => {
       state.authenticationStatus = "pending";
     });
-    builder.addCase(validateUser.rejected, (state, action) => {
+
+    addCase(validateUser.rejected, (state) => {
       state.data = null;
       state.authenticationStatus = "unknown";
     });
-    builder.addCase(
-      verifyUser.fulfilled,
-      (state, action: PayloadAction<userData>) => {
-        const userData = action.payload;
-        state.data = userData;
-        state.authenticationStatus = "confirmed";
-      }
-    );
-    builder.addCase(verifyUser.rejected, (state, action) => {
+
+    addCase(verifyUser.fulfilled, (state, action: PayloadAction<userData>) => {
+      const userData = action.payload;
+      state.data = userData;
+      state.authenticationStatus = "confirmed";
+    });
+
+    addCase(verifyUser.rejected, (state, action) => {
       state.data = null;
       state.verificationError = action.error.message;
       state.authenticationStatus = "unknown";
     });
-    builder.addCase(
-      signupUser.fulfilled,
-      (state, action: PayloadAction<string>) => {
-        state.signupSuccess = `Account successfully created: a verification email has been sent to ${action.payload}`;
-        state.signupError = undefined;
-      }
-    );
-    builder.addCase(
-      signupUser.rejected,
-      (state, action: PayloadAction<unknown>) => {
-        const signupError = action.payload as signupError;
-        state.signupError = {
-          field: signupError.field,
-          error: signupError.error,
-        };
-        state.signupSuccess = undefined;
-      }
-    );
-    builder.addCase(
-      logoutUser.fulfilled,
-      (state, action: PayloadAction<null>) => {
-        state.data = null;
-        state.authenticationStatus = "unknown";
-      }
-    );
-    builder.addCase(logoutUser.pending, (state, action) => {
+
+    addCase(signupUser.fulfilled, (state, action: PayloadAction<string>) => {
+      state.signupSuccess = `Account successfully created: a verification email has been sent to ${action.payload}`;
+      state.signupError = undefined;
+    });
+
+    addCase(signupUser.rejected, (state, action: PayloadAction<unknown>) => {
+      const signupError = action.payload as signupError;
+      state.signupError = {
+        field: signupError.field,
+        error: signupError.error,
+      };
+      state.signupSuccess = undefined;
+    });
+
+    addCase(logoutUser.fulfilled, (state) => {
+      state.data = null;
+      state.authenticationStatus = "unknown";
+    });
+
+    addCase(logoutUser.pending, (state) => {
       state.authenticationStatus = "pending";
     });
   },
