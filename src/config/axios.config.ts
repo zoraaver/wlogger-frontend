@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const backendUrl: string = "https://wlogger.uk/api";
+export const backendUrl: string = "https://wlogger.uk/api";
 const developmentUrl: string = "http://localhost:8080";
 
 export const baseURL =
