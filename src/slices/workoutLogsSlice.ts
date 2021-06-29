@@ -60,8 +60,8 @@ interface S3SignedPostForm {
   fields: { [Key: string]: string };
 }
 
-type videoFileExtension = "mp4" | "mkv" | "mov";
-const validVideoFileExtensions: videoFileExtension[] = ["mov", "mp4", "mkv"];
+const videoFileExtensions = ["mov", "mp4", "mkv"] as const;
+type videoFileExtension = typeof videoFileExtensions[number];
 
 export type WorkoutLogPosition = { setIndex: number; exerciseIndex: number };
 type logVideoFile = WorkoutLogPosition & { file: File };
@@ -77,7 +77,7 @@ export const addFormVideo = createAsyncThunk(
     const fileExtension = file.name.split(".").pop();
     if (
       !fileExtension ||
-      !validVideoFileExtensions.includes(fileExtension as videoFileExtension)
+      !videoFileExtensions.includes(fileExtension as videoFileExtension)
     ) {
       dispatch(
         setFormVideoError(
