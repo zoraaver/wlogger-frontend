@@ -15,6 +15,7 @@ import {
 import { configureStore } from "@reduxjs/toolkit";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { UIReducer } from "./slices/UISlice";
+import { exercisesReducer } from "./slices/exercisesSlice";
 
 const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ const store = configureStore({
     workoutPlans: workoutPlansReducer,
     workoutLogs: workoutLogsReducer,
     workouts: workoutsReducer,
+    exercises: exercisesReducer,
     UI: UIReducer,
   },
 });
