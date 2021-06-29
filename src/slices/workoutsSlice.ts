@@ -3,14 +3,10 @@ import { AxiosResponse } from "axios";
 import { API } from "../config/axios.config";
 import { weightUnit, Day, workoutPlansUrl } from "./workoutPlansSlice";
 
-export type incrementField = "weight" | "repetitions" | "sets";
-export const incrementFields: incrementField[] = [
-  "repetitions",
-  "sets",
-  "weight",
-];
+export const incrementFields = ["repetitions", "sets", "weight"] as const;
+export type incrementField = typeof incrementFields[number];
 
-export interface exerciseData {
+export interface workoutExerciseData {
   name: string;
   restInterval?: number;
   sets: number;
@@ -25,7 +21,7 @@ export interface workoutData {
   dayOfWeek: Day;
   date?: string;
   _id?: string;
-  exercises: Array<exerciseData>;
+  exercises: Array<workoutExerciseData>;
 }
 
 export const getNextWorkout = createAsyncThunk(
