@@ -1,5 +1,5 @@
 import * as React from "react";
-import { exerciseData, workoutData } from "../slices/workoutsSlice";
+import { workoutExerciseData, workoutData } from "../slices/workoutsSlice";
 import Table from "react-bootstrap/Table";
 import { ExerciseRow } from "../components/ExerciseRow";
 import { useAppSelector } from "..";
@@ -32,15 +32,17 @@ export function ExerciseTable({
         </tr>
       </thead>
       <tbody>
-        {workout.exercises.map((exerciseData: exerciseData, index: number) => (
-          <ExerciseRow
-            key={index}
-            exerciseData={exerciseData}
-            weekPosition={weekPosition}
-            index={index}
-            day={workout.dayOfWeek}
-          />
-        ))}
+        {workout.exercises.map(
+          (exerciseData: workoutExerciseData, index: number) => (
+            <ExerciseRow
+              key={index}
+              exerciseData={exerciseData}
+              weekPosition={weekPosition}
+              index={index}
+              day={workout.dayOfWeek}
+            />
+          )
+        )}
       </tbody>
     </Table>
   );

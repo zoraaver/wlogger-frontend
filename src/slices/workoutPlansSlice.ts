@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosResponse } from "axios";
 import { API } from "../config/axios.config";
 import { calculateLength } from "../util/util";
-import { exerciseData, workoutData } from "./workoutsSlice";
+import { workoutExerciseData, workoutData } from "./workoutsSlice";
 
 export const workoutPlansUrl = "/workoutPlans";
 export type workoutPlanStatus = "In progress" | "Completed" | "Not started";
@@ -208,11 +208,10 @@ const slice = createSlice({
     },
     addWorkout(state, action: PayloadAction<{ position: number; day: Day }>) {
       const { position, day } = action.payload;
-      const weekIndex:
-        | number
-        | undefined = state.editWorkoutPlan?.weeks.findIndex(
-        (week: weekData) => week.position === position
-      );
+      const weekIndex: number | undefined =
+        state.editWorkoutPlan?.weeks.findIndex(
+          (week: weekData) => week.position === position
+        );
       if (weekIndex !== undefined && weekIndex >= 0) {
         state.editWorkoutPlan?.weeks[weekIndex].workouts.push({
           dayOfWeek: day,
@@ -228,15 +227,14 @@ const slice = createSlice({
       action: PayloadAction<{
         position: number;
         day: Day;
-        exerciseData: exerciseData;
+        exerciseData: workoutExerciseData;
       }>
     ) {
       const { position, day, exerciseData } = action.payload;
-      const weekIndex:
-        | number
-        | undefined = state.editWorkoutPlan?.weeks.findIndex(
-        (week: weekData) => week.position === position
-      );
+      const weekIndex: number | undefined =
+        state.editWorkoutPlan?.weeks.findIndex(
+          (week: weekData) => week.position === position
+        );
       if (weekIndex !== undefined && weekIndex >= 0) {
         const workout = state.editWorkoutPlan?.weeks[weekIndex].workouts.find(
           (w: workoutData) => w.dayOfWeek === day
@@ -320,11 +318,10 @@ const slice = createSlice({
     ) {
       if (!state.editWorkoutPlan) return;
       const { position, newRepeat } = action.payload;
-      const weekToChange:
-        | weekData
-        | undefined = state.editWorkoutPlan.weeks.find(
-        (week: weekData) => week.position === position
-      );
+      const weekToChange: weekData | undefined =
+        state.editWorkoutPlan.weeks.find(
+          (week: weekData) => week.position === position
+        );
       if (!weekToChange) return;
       state.editWorkoutPlan.weeks.forEach((week: weekData) => {
         if (week.position > weekToChange.position) {

@@ -6,7 +6,7 @@ import { GeneratedWorkoutLogRow } from "../components/GeneratedWorkoutLogRow";
 import { LogVideoFileInput } from "../components/LogVideoFileInput";
 import { RemoveVideoFileInput } from "../components/RemoveVideoFileInput";
 import { addSet, setLogData, workoutLogData } from "../slices/workoutLogsSlice";
-import { exerciseData, workoutData } from "../slices/workoutsSlice";
+import { workoutExerciseData, workoutData } from "../slices/workoutsSlice";
 import { renderRestInterval } from "../util/util";
 
 interface WorkoutPosition {
@@ -40,10 +40,8 @@ export function GeneratedWorkoutLogTable({
     restInterval: Date.now(),
   });
 
-  const [
-    timeElapsedSinceEntryAdded,
-    setTimeElapsedSinceEntryAdded,
-  ] = React.useState(0);
+  const [timeElapsedSinceEntryAdded, setTimeElapsedSinceEntryAdded] =
+    React.useState(0);
 
   React.useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -114,7 +112,7 @@ export function GeneratedWorkoutLogTable({
   function logSet() {
     const exercise = workout.exercises[exerciseIndex];
     // default repetitions to 0 if blank
-    if (formData.repetitions === (("" as unknown) as number))
+    if (formData.repetitions === ("" as unknown as number))
       formData.repetitions = 0;
     dispatch(
       addSet({
@@ -252,7 +250,7 @@ export function GeneratedWorkoutLogTable({
       </thead>
       <tbody>
         {workout.exercises.map(
-          (exercise: exerciseData, exerciseIndex: number) => {
+          (exercise: workoutExerciseData, exerciseIndex: number) => {
             const result: JSX.Element[] = [];
             for (let setIndex = 0; setIndex < exercise.sets; ++setIndex) {
               result.push(

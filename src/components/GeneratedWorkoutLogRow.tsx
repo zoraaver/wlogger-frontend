@@ -1,8 +1,8 @@
 import * as React from "react";
-import { exerciseData } from "../slices/workoutsSlice";
+import { workoutExerciseData } from "../slices/workoutsSlice";
 
 interface GeneratedWorkoutLogRowProps {
-  exercise: exerciseData;
+  exercise: workoutExerciseData;
   exerciseIndex: number;
   setIndex: number;
   setButton: (setIndex: number, exericseIndex: number) => JSX.Element;

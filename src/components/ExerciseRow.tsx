@@ -3,11 +3,11 @@ import Button from "react-bootstrap/Button";
 import { Day, deleteExercise } from "../slices/workoutPlansSlice";
 import { Trash } from "react-bootstrap-icons";
 import { useAppDispatch, useAppSelector } from "..";
-import { exerciseData } from "../slices/workoutsSlice";
+import { workoutExerciseData } from "../slices/workoutsSlice";
 import { renderAutoIncrementField } from "../util/util";
 
 interface ExerciseRowProps {
-  exerciseData: exerciseData;
+  exerciseData: workoutExerciseData;
   day?: Day;
   weekPosition?: number;
   index?: number;

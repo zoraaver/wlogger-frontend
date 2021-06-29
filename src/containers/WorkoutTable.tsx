@@ -1,5 +1,5 @@
 import * as React from "react";
-import { exerciseData, workoutData } from "../slices/workoutsSlice";
+import { workoutExerciseData, workoutData } from "../slices/workoutsSlice";
 import Table from "react-bootstrap/Table";
 import { ExerciseRow } from "../components/ExerciseRow";
 import { useAppSelector } from "..";
@@ -47,7 +47,7 @@ export function WorkoutTable({ workouts, weekPosition }: WorkoutTableProps) {
         </tr>
       );
       const rows: JSX.Element[] = workout.exercises.map(
-        (exercise: exerciseData, index: number) => (
+        (exercise: workoutExerciseData, index: number) => (
           <ExerciseRow
             key={index}
             exerciseData={exercise}
