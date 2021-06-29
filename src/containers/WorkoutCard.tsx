@@ -4,7 +4,7 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { ExerciseTable } from "../containers/ExerciseTable";
 import { Trash } from "react-bootstrap-icons";
-import { ExerciseForm } from "../components/ExerciseForm";
+import { WorkoutPlanExerciseForm } from "../components/WorkoutPlanExerciseForm";
 import { deleteWorkout } from "../slices/workoutPlansSlice";
 import { useAppDispatch } from "..";
 import { workoutData } from "../slices/workoutsSlice";
@@ -39,7 +39,10 @@ export function WorkoutCard({ workout, position }: WorkoutCardProps) {
         <Accordion.Collapse eventKey="0">
           <Card.Body>
             <ExerciseTable workout={workout} weekPosition={position} />
-            <ExerciseForm dayOfWeek={workout.dayOfWeek} position={position} />
+            <WorkoutPlanExerciseForm
+              dayOfWeek={workout.dayOfWeek}
+              position={position}
+            />
           </Card.Body>
         </Accordion.Collapse>
       </Card>
