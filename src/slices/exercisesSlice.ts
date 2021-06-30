@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosResponse } from "axios";
+import { RootState } from "..";
 import { API } from "../config/axios.config";
 import { sortedIndex } from "../util/util";
 
@@ -106,6 +107,11 @@ const slice = createSlice({
     });
   },
 });
+
+// selectors
+
+export const exerciseNamesSelector = (state: RootState) =>
+  state.exercises.data.map((exercise) => exercise.name);
 
 export const exercisesReducer = slice.reducer;
 
