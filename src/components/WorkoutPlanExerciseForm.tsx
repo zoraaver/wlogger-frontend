@@ -14,21 +14,26 @@ import { renderAutoIncrementField } from "../util/util";
 interface ExerciseFormProps {
   dayOfWeek: Day;
   position: number;
+  exerciseNames: string[];
 }
 export function WorkoutPlanExerciseForm({
   dayOfWeek,
   position,
+  exerciseNames,
 }: ExerciseFormProps) {
+  const dispatch = useAppDispatch();
+
   const [formData, setFormData] = React.useState<workoutExerciseData>({
-    name: "Squats",
+    name: exerciseNames[0] ?? "",
     sets: 1,
     weight: 10,
     repetitions: 10,
     unit: "kg",
     restInterval: 0,
   });
+
   const [error, setError] = React.useState({ field: "", message: "" });
-  const dispatch = useAppDispatch();
+
   const weekRepeat: number | undefined = useAppSelector(
     (state) =>
       state.workoutPlans.editWorkoutPlan?.weeks.find(
@@ -139,8 +144,14 @@ export function WorkoutPlanExerciseForm({
             name="name"
             value={formData.name}
             onChange={handleChange}
-            placeholder="exercise name"
-          />
+            as="select"
+          >
+            {exerciseNames.map((exerciseName) => (
+              <option key={exerciseName} value={exerciseName}>
+                {exerciseName}
+              </option>
+            ))}
+          </Form.Control>
           {error.field === "name" ? (
             <div className="text-danger">{error.message}</div>
           ) : null}
