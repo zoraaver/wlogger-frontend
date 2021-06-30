@@ -16,6 +16,8 @@ import { useHistory } from "react-router";
 import { resetSuccess } from "../slices/workoutLogsSlice";
 import { UploadProgress } from "../components/UploadProgress";
 import { Form } from "react-bootstrap";
+import { exerciseNamesSelector, getExercises } from "../slices/exercisesSlice";
+import { Link } from "react-router-dom";
 
 export function NewWorkoutLogPage() {
   const workoutLog = useAppSelector(
@@ -27,12 +29,16 @@ export function NewWorkoutLogPage() {
   const videoUploadProgress = useAppSelector(
     (state) => state.workoutLogs.videoUploadProgress
   );
+
+  const exerciseNames = useAppSelector(exerciseNamesSelector);
+
   const dispatch = useAppDispatch();
   const history = useHistory();
 
   React.useEffect(() => {
     dispatch(clearFormVideos());
     dispatch(clearEditWorkoutLog());
+    dispatch(getExercises());
   }, []);
 
   if (Object.keys(videoUploadProgress).length)
@@ -49,32 +55,43 @@ export function NewWorkoutLogPage() {
   return (
     <Container className="mt-5 d-flex flex-column justify-content-start align-items-center">
       <h2 className="my-3">New Log</h2>
-      <WorkoutLogForm />
-      {formVideoError ? (
-        <Alert
-          dismissible
-          className="my-3"
-          variant="danger"
-          show={!!formVideoError}
-          onClose={() => dispatch(setFormVideoError(undefined))}
-        >
-          {formVideoError}
-        </Alert>
-      ) : null}
-      <h4 className="mt-4">Logged sets:</h4>
-      <WorkoutLogTable edit={true} />
-      <Form className="w-75 mb-3">
-        <Form.Label>Notes:</Form.Label>
-        <Form.Control
-          as="textarea"
-          placeholder="Max 1000 characters"
-          value={workoutLog.notes || ""}
-          onChange={({ target }) => dispatch(setLogNotes(target.value))}
-        />
-      </Form>
-      <Button variant="success" onClick={handleSubmit}>
-        Log workout
-      </Button>
+      {exerciseNames.length ? (
+        <>
+          <WorkoutLogForm exerciseNames={exerciseNames} />
+          {formVideoError ? (
+            <Alert
+              dismissible
+              className="my-3"
+              variant="danger"
+              show={!!formVideoError}
+              onClose={() => dispatch(setFormVideoError(undefined))}
+            >
+              {formVideoError}
+            </Alert>
+          ) : null}
+          <h4 className="mt-4">Logged sets:</h4>
+          <WorkoutLogTable edit={true} />
+          <Form className="w-75 mb-3">
+            <Form.Label>Notes:</Form.Label>
+            <Form.Control
+              as="textarea"
+              placeholder="Max 1000 characters"
+              value={workoutLog.notes || ""}
+              onChange={({ target }) => dispatch(setLogNotes(target.value))}
+            />
+          </Form>
+          <Button variant="success" onClick={handleSubmit}>
+            Log workout
+          </Button>
+        </>
+      ) : (
+        <Container className="d-flex flex-column justify-content-center align-items-center">
+          <h4>No exercises found</h4>
+          <Link to="/exercises" className="btn btn-primary">
+            Add Exercise
+          </Link>
+        </Container>
+      )}
     </Container>
   );
 }
