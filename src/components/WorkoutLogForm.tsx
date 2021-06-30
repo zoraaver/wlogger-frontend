@@ -5,42 +5,34 @@ import Button from "react-bootstrap/Button";
 import { useAppDispatch, useAppSelector } from "..";
 import { addSet, EntryData, setLogDate } from "../slices/workoutLogsSlice";
 import { weightUnit } from "../slices/workoutPlansSlice";
-import { isToday, renderRestInterval } from "../util/util";
+import { isToday } from "../util/util";
+import { WorkoutLogTimer } from "./WorkoutLogTimer";
 
-export function WorkoutLogForm() {
+interface WorkoutLogFormProps {
+  exerciseNames: string[];
+}
+
+export function WorkoutLogForm({ exerciseNames }: WorkoutLogFormProps) {
+  const dispatch = useAppDispatch();
+
   const [formData, setFormData] = React.useState<EntryData>({
-    name: "",
+    name: exerciseNames[0] ?? "",
     repetitions: 0,
     weight: 0,
     restInterval: Date.now(),
     unit: "kg",
   });
+
   const [error, setError] = React.useState("");
-  const [timeElapsedSinceEntryAdded, setTimeElapsedSinceEntryAdded] =
-    React.useState(0);
   const [setInProgress, setSetInProgress] = React.useState(false);
-  const dispatch = useAppDispatch();
+  const [restIntervalTimer, setRestIntervalTimer] = React.useState(false);
+
   const logDateString = useAppSelector(
     (state) => state.workoutLogs.editWorkoutLog.createdAt
   );
-  const [restIntervalTimer, setRestIntervalTimer] = React.useState(false);
 
   const maxDate: string = new Date(Date.now()).toISOString().split("T")[0];
   const logDate: string = logDateString || maxDate;
-
-  React.useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (!setInProgress) {
-      timer = setInterval(() => {
-        setTimeElapsedSinceEntryAdded(Date.now() - formData.restInterval);
-      }, 1000);
-    } else {
-      setTimeElapsedSinceEntryAdded(formData.restInterval * 1000);
-    }
-    return () => {
-      clearInterval(timer);
-    };
-  }, [setInProgress, formData.restInterval]);
 
   function handleChange({ target }: React.ChangeEvent<HTMLInputElement>) {
     const numberValue = Number(target.value);
@@ -131,11 +123,6 @@ export function WorkoutLogForm() {
     }
   }
 
-  function handleResetTimer() {
-    if (setInProgress) return;
-    setFormData({ ...formData, restInterval: Date.now() });
-  }
-
   return (
     <Form onSubmit={handleSubmit} className="w-75 mt-3">
       <Form.Row className="mb-5">
@@ -164,12 +151,17 @@ export function WorkoutLogForm() {
         <Col>
           <Form.Label>Exercise</Form.Label>
           <Form.Control
+            as="select"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            type="text"
-            placeholder="exercise name"
-          />
+          >
+            {exerciseNames.map((exerciseName) => (
+              <option key={exerciseName} value={exerciseName}>
+                {exerciseName}
+              </option>
+            ))}
+          </Form.Control>
         </Col>
         <Col>
           <Form.Label>Reps</Form.Label>
@@ -204,20 +196,11 @@ export function WorkoutLogForm() {
           </Form.Control>
         </Col>
         {restIntervalTimer ? (
-          <>
-            <Col>
-              <Form.Label>Rest Interval</Form.Label>
-              <Form.Control
-                readOnly
-                value={renderRestInterval(timeElapsedSinceEntryAdded / 1000)}
-              />
-            </Col>
-            <Col className="d-flex flex-column justify-content-end align-items-center">
-              <Button disabled={setInProgress} onClick={handleResetTimer}>
-                Reset timer
-              </Button>
-            </Col>
-          </>
+          <WorkoutLogTimer
+            formData={formData}
+            setFormData={setFormData}
+            setInProgress={setInProgress}
+          />
         ) : null}
         <Col
           className="d-flex flex-column justify-content-end align-items-center"
