@@ -15,26 +15,33 @@ import { SomethingWentWrongAlert } from "../components/SomethingWentWrongAlert";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { workoutData } from "../slices/workoutsSlice";
 import { WeekForm } from "../components/WeekForm";
+import { exerciseNamesSelector } from "../slices/exercisesSlice";
 
 export function EditWeekPage() {
+  const dispatch = useAppDispatch();
+
+  const history = useHistory();
+
   const params = useParams<{
     position: string;
     id?: string;
   }>();
+
   const position: number = Number(params.position);
   const id: string | undefined = params.id;
 
-  const history = useHistory();
   const week = useAppSelector((state) =>
     state.workoutPlans.editWorkoutPlan?.weeks.find(
       (week: weekData) => week.position === position
     )
   ) as weekData;
+
   const error: string | undefined = useAppSelector(
     (state) => state.workoutPlans.error
   );
 
-  const dispatch = useAppDispatch();
+  const exerciseNames = useAppSelector(exerciseNamesSelector);
+
   React.useEffect(() => {
     if (id && !week) {
       dispatch(getWorkoutPlan(id));
@@ -84,6 +91,7 @@ export function EditWeekPage() {
       {workouts.map((workout: workoutData) => {
         return (
           <WorkoutCard
+            exerciseNames={exerciseNames}
             position={position}
             workout={workout}
             key={workout.dayOfWeek}
