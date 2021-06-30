@@ -26,7 +26,9 @@ export function ExerciseForm() {
   }
 
   function handleSubmit() {
-    if (!exerciseNameError) {
+    if (!formData.name) {
+      setExerciseNameError("Exercise name is required");
+    } else if (!exerciseNameError) {
       dispatch(postExercise(formData));
       setFormData({ name: "", notes: "" });
     }
