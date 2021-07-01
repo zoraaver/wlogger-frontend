@@ -58,6 +58,22 @@ export const deleteExercise = createAsyncThunk(
   }
 );
 
+export const patchExercise = createAsyncThunk(
+  "exercises/patchExercise",
+  async (data: exerciseData) => {
+    try {
+      const response: AxiosResponse<exerciseData> = await API.patch(
+        `${exercisesUrl}/${data._id}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject(error);
+    }
+  }
+);
+
 interface exercisesSliceState {
   data: exerciseData[];
 }
@@ -103,6 +119,23 @@ const slice = createSlice({
     });
 
     addCase(deleteExercise.rejected, (_, action) => {
+      console.error(action.error.message);
+    });
+
+    addCase(
+      patchExercise.fulfilled,
+      (state, { payload: updatedExercise }: PayloadAction<exerciseData>) => {
+        const exerciseIndex: number = state.data.findIndex(
+          (exercise) => exercise._id === updatedExercise._id
+        );
+
+        if (exerciseIndex >= 0) {
+          state.data[exerciseIndex] = updatedExercise;
+        }
+      }
+    );
+
+    addCase(patchExercise.rejected, (_, action) => {
       console.error(action.error.message);
     });
   },
