@@ -201,11 +201,13 @@ const slice = createSlice({
       state.editWorkoutPlan = action.payload;
       state.editWorkoutPlan.length = 0;
     },
+
     addWeek(state, action: PayloadAction<weekData>) {
       if (!state.editWorkoutPlan) return;
       state.editWorkoutPlan.weeks.push(action.payload);
       state.editWorkoutPlan.length = calculateLength(state.editWorkoutPlan);
     },
+
     addWorkout(state, action: PayloadAction<{ position: number; day: Day }>) {
       const { position, day } = action.payload;
       const weekIndex: number | undefined =
@@ -222,6 +224,7 @@ const slice = createSlice({
         );
       }
     },
+
     addExercise(
       state,
       action: PayloadAction<{
@@ -244,6 +247,7 @@ const slice = createSlice({
         }
       }
     },
+
     deleteExercise(
       state,
       action: PayloadAction<{
@@ -265,6 +269,7 @@ const slice = createSlice({
         }
       }
     },
+
     deleteWeek(state, action: PayloadAction<number>) {
       const position: number = action.payload;
       if (!state.editWorkoutPlan) return;
@@ -282,6 +287,7 @@ const slice = createSlice({
         state.editWorkoutPlan.length = calculateLength(state.editWorkoutPlan);
       }
     },
+
     deleteWorkout(
       state,
       action: PayloadAction<{ position: number; day: Day }>
@@ -300,6 +306,7 @@ const slice = createSlice({
         }
       }
     },
+
     deleteEmptyWorkouts(state, action: PayloadAction<number>) {
       if (!state.editWorkoutPlan) return;
       const postion: number = action.payload;
@@ -312,6 +319,7 @@ const slice = createSlice({
         );
       }
     },
+
     changeWeekRepeat(
       state,
       action: PayloadAction<{ position: number; newRepeat: number }>
@@ -331,31 +339,36 @@ const slice = createSlice({
       weekToChange.repeat = newRepeat;
       state.editWorkoutPlan.length = calculateLength(state.editWorkoutPlan);
     },
+
     setSuccess(state, action: PayloadAction<string | undefined>) {
       state.success = action.payload;
     },
+
     setError(state, action: PayloadAction<string | undefined>) {
       state.error = action.payload;
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(
+  extraReducers: ({ addCase }) => {
+    addCase(
       postWorkoutPlan.fulfilled,
       (state, action: PayloadAction<workoutPlanData>) => {
         state.success = `${action.payload.name} successfully created`;
         state.editWorkoutPlan = action.payload;
       }
     );
-    builder.addCase(postWorkoutPlan.rejected, (state, action) => {
+
+    addCase(postWorkoutPlan.rejected, (state, action) => {
       state.success = undefined;
     });
-    builder.addCase(getWorkoutPlans.fulfilled, (state, action) => {
+
+    addCase(getWorkoutPlans.fulfilled, (state, action) => {
       state.data = action.payload;
       state.data.forEach((plan: workoutPlanHeaderData) => {
         plan.length = calculateLength(plan);
       });
     });
-    builder.addCase(
+
+    addCase(
       getWorkoutPlan.fulfilled,
       (state, action: PayloadAction<workoutPlanData>) => {
         state.editWorkoutPlan = action.payload;
@@ -363,14 +376,16 @@ const slice = createSlice({
         state.error = undefined;
       }
     );
-    builder.addCase(
+
+    addCase(
       getWorkoutPlan.rejected,
       (state, action: PayloadAction<unknown>) => {
         state.editWorkoutPlan = undefined;
         state.error = (action.payload as { message: string }).message;
       }
     );
-    builder.addCase(
+
+    addCase(
       patchWorkoutPlan.fulfilled,
       (state, action: PayloadAction<workoutPlanData>) => {
         state.editWorkoutPlan = action.payload;
@@ -379,14 +394,16 @@ const slice = createSlice({
         state.error = undefined;
       }
     );
-    builder.addCase(
+
+    addCase(
       patchWorkoutPlan.rejected,
       (state, action: PayloadAction<unknown>) => {
         state.editWorkoutPlan = undefined;
         state.error = (action.payload as { message: string }).message;
       }
     );
-    builder.addCase(
+
+    addCase(
       deleteWorkoutPlan.fulfilled,
       (state, action: PayloadAction<workoutPlanData["_id"]>) => {
         state.editWorkoutPlan = undefined;
@@ -398,14 +415,16 @@ const slice = createSlice({
         state.error = undefined;
       }
     );
-    builder.addCase(
+
+    addCase(
       deleteWorkoutPlan.rejected,
       (state, action: PayloadAction<unknown>) => {
         state.editWorkoutPlan = undefined;
         state.error = (action.payload as { message: string }).message;
       }
     );
-    builder.addCase(
+
+    addCase(
       patchStartWorkoutPlan.fulfilled,
       (state, action: PayloadAction<{ id: string; start: string }>) => {
         const previousPlan = state.data.find(
@@ -421,16 +440,19 @@ const slice = createSlice({
         }
       }
     );
-    builder.addCase(patchStartWorkoutPlan.rejected, (state, action) => {
+
+    addCase(patchStartWorkoutPlan.rejected, (state, action) => {
       state.success = undefined;
       state.error = action.error.message;
     });
-    builder.addCase(getCurrentPlan.fulfilled, (state, action) => {
+
+    addCase(getCurrentPlan.fulfilled, (state, action) => {
       state.error = undefined;
       state.currentPlan = action.payload;
       state.currentPlan.length = calculateLength(state.currentPlan);
     });
-    builder.addCase(getCurrentPlan.rejected, (state, action) => {
+
+    addCase(getCurrentPlan.rejected, (state, action) => {
       state.currentPlan = undefined;
     });
   },
